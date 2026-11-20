@@ -15,6 +15,7 @@ Base URL: `/api` · JSON only except `/api/payments/webhook` and multipart image
 
 | Method | Path | Purpose |
 | --- | --- | --- |
+| GET | `/health` | Liveness probe for hosting platforms; returns `{ success: true, data: { status: "ok" } }` |
 | POST | `/auth/register` | Create customer account |
 | POST | `/auth/login` | Customer login |
 | POST | `/auth/admin/login` | Admin login |

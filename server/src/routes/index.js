@@ -8,6 +8,9 @@ import payments, { webhookRouter } from './payment.routes.js';
 
 const router = Router();
 
+// Lightweight liveness check for hosting platforms and uptime monitors.
+router.get('/health', (_req, res) => res.json({ success: true, data: { status: 'ok' } }));
+
 // Stripe needs the untouched raw body for signature verification.
 router.use(webhookRouter);
 

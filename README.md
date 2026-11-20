@@ -350,15 +350,16 @@ The production Vite build reports a non-fatal chunk-size warning for the Rechart
 
 ## Deployment notes
 
-1. Build the client: `npm run build`.
-2. Set production environment variables, including secure JWT secrets, `CLIENT_URL`, Atlas `MONGO_URI`, Stripe, SMTP and Cloudinary credentials.
-3. Start the server: `npm start`. It serves the API and `client/dist` from one process.
-4. Configure the Stripe webhook endpoint to `https://<domain>/api/webhooks/stripe` and set `STRIPE_WEBHOOK_SECRET`.
-5. Add the deployment hostname to Cloudinary/SMTP allowlists where required.
-6. Run `npm run seed` once against the production database, then `npm run seed:demo` only for staging/demo environments.
-7. Review [docs/CHECKLIST.md](docs/CHECKLIST.md) before going live.
+The fastest free deployment is **Render Web Service + MongoDB Atlas**, using the included `render.yaml` Blueprint. It serves the API and built client from one HTTPS domain, so refresh cookies and CORS work without extra configuration.
 
-Do not commit `.env`, uploads or build output. They are excluded by `.gitignore`.
+1. Create a free MongoDB Atlas cluster and copy its SRV connection string.
+2. In Render, choose **New + → Blueprint** and select this repository. Paste the Atlas URI when prompted; JWT secrets are generated automatically.
+3. Render runs `npm install && npm run build`, then `npm start`. The liveness probe uses `/api/health`.
+4. Open **Shell** in the Render dashboard and run `npm run seed`, then `npm run seed:demo`.
+5. Open the Render URL and verify the storefront, checkout, admin login and Arabic RTL.
+6. For real payments/email/uploads, add Stripe, SMTP and Cloudinary credentials and configure the Stripe webhook at `https://<domain>/api/webhooks/stripe`.
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for exact Atlas/Render steps, the full environment-variable table, Vercel/Netlify tradeoffs and post-deploy checks. Do not commit `.env`, uploads or build output; they are excluded by `.gitignore`.
 
 ---
 
@@ -378,6 +379,7 @@ Do not commit `.env`, uploads or build output. They are excluded by `.gitignore`
 
 ## Documentation
 
+- [Deployment guide](DEPLOYMENT.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [API reference](docs/API.md)
 - [Production checklist](docs/CHECKLIST.md)

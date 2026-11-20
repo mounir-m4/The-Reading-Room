@@ -18,7 +18,8 @@ export const env = {
   isProduction: process.env.NODE_ENV === 'production',
   isTest: process.env.NODE_ENV === 'test',
   port: number(process.env.PORT, 5000),
-  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+  // Render injects RENDER_EXTERNAL_URL; use it so a single-service deploy needs no CLIENT_URL.
+  clientUrl: process.env.CLIENT_URL || process.env.RENDER_EXTERNAL_URL || 'http://localhost:5173',
   mongoUri: process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/the_reading_room',
   useMemoryDb: process.env.USE_MEMORY_DB === 'true',
   jwt: {
