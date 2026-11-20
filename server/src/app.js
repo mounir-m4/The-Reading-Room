@@ -28,15 +28,27 @@ export function createApp() {
   app.use(compression());
   app.use(cookieParser());
   if (!env.isTest) app.use(morgan('tiny', { stream: { write: (msg) => logger.info(msg.trim()) } }));
-  app.use(express.json({ limit: '2mb' }));
+  app.use(express.json({
+    limit: '2mb',
+    // Keep the untouched payload for Stripe signature verification.
+    verify: (req, _res, buf) => {
+      if (req.originalUrl?.startsWith('/api/payments/webhook')) req.rawBody = buf;
+    },
+  }));
   app.use(express.urlencoded({ extended: true, limit: '2mb' }));
   app.use(sanitizeInput);
   app.use('/api', apiLimiter, routes);
 
-  // Locally uploaded images (production uses Cloudinary).
-  const uploadsDir = path.resolve(process.cwd(), 'uploads');
-  fs.mkdirSync(uploadsDir, { recursive: true });
-  app.use('/uploads', express.static(uploadsDir, { maxAge: '7d' }));
+  // Local uploads are unavailable on read-only serverless filesystems.
+  if (!env.isServerless) {
+    const uploadsDir = path.resolve(process.cwd(), 'uploads');
+    try {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+      app.use('/uploads', express.static(uploadsDir, { maxAge: '7d' }));
+    } catch (error) {
+      logger.warn(`Local uploads disabled: ${error.message}`);
+    }
+  }
 
   // SEO files & built SPA
   const clientDist = path.resolve(__dirname, '../../client/dist');

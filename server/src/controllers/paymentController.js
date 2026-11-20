@@ -54,7 +54,7 @@ export const stripeWebhook = asyncHandler(async (req, res) => {
   const signature = req.headers['stripe-signature'];
   let event;
   try {
-    event = stripe.webhooks.constructEvent(req.body, signature, env.stripe.webhookSecret);
+    event = stripe.webhooks.constructEvent(req.rawBody || req.body, signature, env.stripe.webhookSecret);
   } catch (error) {
     return res.status(400).json({ success: false, error: { message: `Webhook signature error: ${error.message}` } });
   }

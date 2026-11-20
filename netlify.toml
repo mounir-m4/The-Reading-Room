@@ -1,0 +1,34 @@
+[build]
+  command = "npm install && npm run build --workspace client"
+  publish = "client/dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# API + generated SEO routes go to the Express function.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api"
+  status = 200
+
+[[redirects]]
+  from = "/uploads/*"
+  to = "/.netlify/functions/api"
+  status = 200
+
+[[redirects]]
+  from = "/robots.txt"
+  to = "/.netlify/functions/api"
+  status = 200
+
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/.netlify/functions/api"
+  status = 200
+
+# SPA fallback. Netlify still serves existing static assets directly.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

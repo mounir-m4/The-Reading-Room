@@ -2,108 +2,93 @@
 
 ## Recommended free stack
 
-| Layer | Platform | Free tier purpose |
+| Layer | Platform | Why |
 | --- | --- | --- |
-| App + API | **Render Web Service** | Runs the Express server and serves the built Vite client from one domain. |
-| Database | **MongoDB Atlas** | Free shared cluster (M0) for documents. |
-| Domain | Render subdomain | `https://<service>.onrender.com` is included. |
+| Static client + API | **Netlify** | Free forever, **no credit card required**, allows commercial projects, built-in HTTPS and serverless functions. |
+| Database | **MongoDB Atlas** | Free shared M0 cluster. |
+| Domain | Netlify subdomain | `https://<site>.netlify.app` is included; custom domains are free too. |
 
-**Why Render instead of Vercel/Netlify?** This project is a long-running Express app with `HttpOnly` refresh cookies, local-process state such as rate limiting, and local upload fallback. Render runs it unchanged on a single origin, so cookies, CORS and routing work without a serverless adapter. Vercel/Netlify can host the static client, but the API needs to be converted to serverless functions, uploads must use Cloudinary, and split-domain cookies need extra configuration. It is possible, but it is not the fastest path to a working free deployment.
+Netlify hosts the Vite build as static files and runs the Express API as a serverless function through `netlify/functions/api.js`. A single Netlify domain means refresh cookies, CORS and client-side routing work without a separate backend host.
 
-> Free-tier caveats: Render free web services sleep after inactivity and have a cold start on the next request. Atlas free clusters can pause after prolonged inactivity and resume on first access. This is fine for a portfolio/demo, not for a production storefront.
+> **Why not Render?** Render currently asks for a credit card to verify identity, so it does not fit your requirement.
+>
+> **Why not Vercel?** Vercel Hobby is free and card-free, but its terms restrict it to non-commercial personal use. A bookstore that takes payments would need the paid Pro plan.
+>
+> **Why not Cloudflare Workers?** It is a good free platform, but this Express app needs Node compatibility, a Durable Object for database connections and more invasive changes than Netlify.
+
+Free-tier caveats:
+
+- Netlify's new credit-based Free plan includes **300 credits/month** with a hard limit. A production deploy costs 15 credits, bandwidth 20 credits/GB and web requests 2 credits per 10,000. When credits run out, all sites on the account pause until the next billing cycle.
+- Netlify Functions are serverless: uploads need Cloudinary because the filesystem is read-only. The seeded demo books use external Unsplash images, so the demo works without it.
+- Atlas free clusters can pause after prolonged inactivity and resume on the next request.
 
 ---
 
 ## 1. Create the MongoDB Atlas database
 
-1. Sign up at <https://www.mongodb.com/atlas> and create a **Free** shared cluster (M0). A provider/region such as AWS Frankfurt or AWS Paris is fine.
-2. Under **Database Access**, create a database user with a strong password and the `readWrite` role on `the_reading_room`.
-3. Under **Network Access**, add `0.0.0.0/0` for the demo. Render does not have a static outbound IP on the free plan. For a production deployment, restrict this to your service's egress IPs.
-4. Click **Connect → Drivers → Node.js** and copy the SRV connection string. It looks like:
+1. Sign up at <https://www.mongodb.com/atlas> and create a **Free** shared cluster (M0).
+2. Under **Database Access**, create a user with `readWrite` on `the_reading_room` and a strong password.
+3. Under **Network Access**, add `0.0.0.0/0` for the demo. Serverless functions do not have a static outbound IP.
+4. Copy the SRV connection string from **Connect → Drivers → Node.js**:
 
 ```text
 mongodb+srv://USER:PASSWORD@cluster.mongodb.net/the_reading_room?retryWrites=true&w=majority
 ```
 
-Replace `USER`, `PASSWORD`, and the cluster hostname with your own values.
-
 ---
 
-## 2. Deploy with the Render Blueprint
+## 2. Deploy on Netlify
 
-`render.yaml` is included in the repository.
+The repository already contains `netlify.toml` and the API function.
 
 1. Push your latest `main` branch to GitHub.
-2. In Render, click **New + → Blueprint**.
-3. Connect the `The-Reading-Room` GitHub repository and select `main`.
-4. Render reads `render.yaml` and asks for `MONGO_URI`. Paste the Atlas SRV URI.
-5. `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` are generated automatically by Render.
-6. Click **Apply** and wait for the first build to finish.
+2. In Netlify, click **Add new site → Import an existing project**.
+3. Choose GitHub and select `mounir-m4/The-Reading-Room`.
+4. Netlify reads `netlify.toml` automatically:
+   - **Build command:** `npm install && npm run build --workspace client`
+   - **Publish directory:** `client/dist`
+   - **Functions directory:** `netlify/functions`
+   - **Node version:** 20
+5. Add the environment variables below before deploying.
+6. Click **Deploy site**.
 
-The Blueprint uses:
-
-- **Build:** `npm install && npm run build`
-- **Start:** `npm start`
-- **Health check:** `/api/health`
-- **Node:** 18+ (set by `package.json` engines)
-
-The server reads Render's built-in `RENDER_EXTERNAL_URL`, so CORS, sitemap URLs and secure cookies use your live URL automatically. You do not need to set `CLIENT_URL` for a single-service deployment.
-
-### Manual Render setup (alternative)
-
-If you do not use the Blueprint, create a **Web Service** with:
-
-| Setting | Value |
-| --- | --- |
-| Repository | `https://github.com/mounir-m4/The-Reading-Room` |
-| Branch | `main` |
-| Runtime | Node |
-| Plan | Free |
-| Build command | `npm install && npm run build` |
-| Start command | `npm start` |
-| Health check path | `/api/health` |
-
-Then add the environment variables from the table below.
+Netlify exposes the site URL as `URL`, and the server uses it automatically for CORS, sitemap links and secure cookies. You do not need to set `CLIENT_URL` unless you use a custom domain with a different hostname.
 
 ---
 
 ## 3. Environment variables
 
+In **Site configuration → Environment variables**, add:
+
 | Variable | Required | Value |
 | --- | --- | --- |
 | `NODE_ENV` | Yes | `production` |
 | `MONGO_URI` | Yes | Atlas SRV connection string |
-| `JWT_ACCESS_SECRET` | Yes | Long random value; Blueprint generates it |
-| `JWT_REFRESH_SECRET` | Yes | Different long random value; Blueprint generates it |
-| `CLIENT_URL` | No | Defaults to Render's `RENDER_EXTERNAL_URL` |
-| `PORT` | No | Render injects this; defaults to `5000` |
+| `JWT_ACCESS_SECRET` | Yes | Long random value, different from the refresh secret |
+| `JWT_REFRESH_SECRET` | Yes | Long random value, different from the access secret |
+| `CLIENT_URL` | No | Defaults to Netlify's `URL`; set to your custom domain if needed |
 | `MAIL_FROM` | No | `The Reading Room <hello@thereadingroom.test>` |
-| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | No | Recommended if admins will upload images |
-| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | No | Recommended for real emails |
+| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Recommended | Enables persistent admin image uploads |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | No | Enables real email delivery |
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` / `STRIPE_PUBLISHABLE_KEY` | No | Only for real card payments |
 
-The app refuses to start in production if JWT secrets are missing or still contain `change-me`.
+Generate each JWT secret with:
 
-Without Cloudinary, uploaded files are written to the service's temporary filesystem and disappear on redeploy. The seeded demo books use external Unsplash images, so the demo works without Cloudinary.
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+```
+
+The app refuses to start in production if JWT secrets are missing or still contain `change-me`.
 
 ---
 
 ## 4. Seed the live database
 
-The seed scripts must run against the Atlas database, not your local one.
+The seed scripts must run against the Atlas database.
 
-### Option A — Render Shell (easiest)
+### Option A — Local shell (easiest)
 
-In the Render dashboard, open your service and click **Shell**, then run:
-
-```bash
-npm run seed
-npm run seed:demo
-```
-
-### Option B — Run from your computer
-
-**PowerShell:**
+**Windows PowerShell:**
 
 ```powershell
 $env:MONGO_URI = "mongodb+srv://USER:PASSWORD@cluster.mongodb.net/the_reading_room?retryWrites=true&w=majority"
@@ -118,44 +103,53 @@ MONGO_URI="mongodb+srv://USER:PASSWORD@cluster.mongodb.net/the_reading_room?retr
 MONGO_URI="mongodb+srv://USER:PASSWORD@cluster.mongodb.net/the_reading_room?retryWrites=true&w=majority" npm run seed:demo
 ```
 
-`seed:demo` is idempotent and gives you the full catalogue, orders and admin screens used in the README screenshots.
+### Option B — Netlify build hook (one-time workaround)
 
-> The demo accounts and passwords are documented publicly in `README.md`. That is acceptable for a demo, but before treating the site as a real store, change or remove those users and set `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` to private values before running `npm run seed`.
+Temporarily create a separate branch that runs `npm run seed && npm run seed:demo` in the Netlify build command, deploy it once, then remove the branch/deploy. The local shell option is simpler and safer.
+
+`seed:demo` is idempotent and creates the full catalogue, orders and admin screens used in the README screenshots.
+
+> The demo credentials are public in `README.md`. That is acceptable for a demo, but before treating the site as a real store, change/remove those users and set `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` to private values before running `npm run seed`.
 
 ---
 
 ## 5. Verify the deployment
 
-1. Open the Render URL, e.g. `https://the-reading-room.onrender.com`.
-2. Check `https://<your-url>/api/health` returns `{"success":true,"data":{"status":"ok"}}`.
-3. Load the storefront, shop, book detail, cart and checkout pages.
-4. Sign in with `reader@bookstore.test` / `Reader@12345` and confirm a test order can be placed with COD/mock payment.
-5. Sign in to `/admin` with `admin@bookstore.test` / `Admin@12345` and open Dashboard, Orders and Inventory.
+1. Open the Netlify URL, e.g. `https://the-reading-room.netlify.app`.
+2. Check `/api/health` returns `{"success":true,"data":{"status":"ok"}}`.
+3. Load the storefront, `/shop`, a book detail page, `/cart` and `/checkout`.
+4. Sign in with `reader@bookstore.test` / `Reader@12345` and place a test COD/mock order.
+5. Sign in at `/admin` with `admin@bookstore.test` / `Admin@12345` and open Dashboard, Orders and Inventory.
 6. Switch language to Arabic and confirm RTL layout.
-7. Check the browser console for mixed-content or CORS errors.
+7. Open the browser console and confirm no CORS, mixed-content or 404 errors.
 
-The first request after a free service sleeps may take 30–60 seconds. Render shows the service as `Alive` once it responds.
+If the first request is slow, the serverless function and Atlas cluster are waking up.
 
 ---
 
 ## 6. Optional production upgrades
 
-- **Custom domain:** Render supports free custom domains with automatic TLS. Point a CNAME at the Render hostname, then add it under **Settings → Custom Domains**. Update `CLIENT_URL` to the custom domain if you set it explicitly.
-- **Cloudinary:** Add the three `CLOUDINARY_*` variables so admin uploads survive redeploys.
+- **Custom domain:** Netlify Free includes custom domains with automatic TLS. Add it under **Domain management**, then set `CLIENT_URL` to the custom domain if it differs from the Netlify URL.
+- **Cloudinary:** Add the `CLOUDINARY_*` variables so uploaded images survive function restarts.
 - **SMTP:** Add SMTP variables so verification and order emails are delivered instead of logged.
-- **Stripe:** Add Stripe keys, set the webhook endpoint to `https://<your-domain>/api/webhooks/stripe`, and set `STRIPE_WEBHOOK_SECRET` to the signing secret.
-- **Monitoring:** Point an uptime monitor at `/api/health`.
+- **Stripe:** Add Stripe keys, set the webhook endpoint to `https://<your-domain>/api/payments/webhook`, and use `STRIPE_WEBHOOK_SECRET` from that endpoint.
+- **Monitoring:** Point an uptime check at `/api/health`.
 
 ---
 
-## 7. If you specifically want Vercel or Netlify
+## 7. Local verification before deploying
 
-Vercel/Netlify can host the **static client** for free, but the Express API needs a serverless wrapper. A future adaptation would require:
+```bash
+npm.cmd run lint
+npm.cmd test
+npm.cmd run build --workspace client
+```
 
-1. Adding `serverless-http` and an `api/index.js` (or Netlify function) that exports the Express app.
-2. Connecting Mongoose once per warm serverless instance.
-3. Setting `CLIENT_URL` to the frontend domain and adding `withCredentials` to the Axios client.
-4. Requiring Cloudinary for uploads because serverless filesystems are read-only.
-5. Configuring rewrites so `/api/*` reaches the function and all other routes serve `client/dist/index.html`.
+You can also invoke the Netlify function locally with a fake event:
 
-That is more moving parts than the single Render service, so Render is the recommended free deployment for this project today.
+```powershell
+$env:NETLIFY = "true"
+node --input-type=module -e "import('./netlify/functions/api.js').then(async m => { const r = await m.handler({ path: '/api/health', httpMethod: 'GET', headers: { 'x-forwarded-for': '127.0.0.1' }, queryStringParameters: {}, body: null, isBase64Encoded: false, requestContext: { identity: { sourceIp: '127.0.0.1' } } }, {}); console.log(r.statusCode, r.body); process.exit(0); })"
+```
+
+Expected output contains `200` and `{"success":true,"data":{"status":"ok"}}`.

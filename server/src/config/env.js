@@ -17,9 +17,12 @@ export const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   isProduction: process.env.NODE_ENV === 'production',
   isTest: process.env.NODE_ENV === 'test',
+  isServerless: Boolean(
+    process.env.NETLIFY || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.CF_PAGES,
+  ),
   port: number(process.env.PORT, 5000),
-  // Render injects RENDER_EXTERNAL_URL; use it so a single-service deploy needs no CLIENT_URL.
-  clientUrl: process.env.CLIENT_URL || process.env.RENDER_EXTERNAL_URL || 'http://localhost:5173',
+  // Netlify exposes URL and Render exposes RENDER_EXTERNAL_URL. Use either automatically.
+  clientUrl: process.env.CLIENT_URL || process.env.URL || process.env.RENDER_EXTERNAL_URL || 'http://localhost:5173',
   mongoUri: process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/the_reading_room',
   useMemoryDb: process.env.USE_MEMORY_DB === 'true',
   jwt: {

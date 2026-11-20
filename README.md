@@ -314,7 +314,7 @@ The API is mounted under `/api` and returns `{ success, data, meta? }` envelopes
 | Commerce | `GET/POST /api/cart`, `/api/cart/coupon`, `POST /api/orders/preview`, `POST /api/orders`, `GET /api/orders/mine`, `/api/orders/track/:number` |
 | Content | `GET /api/cms/homepage`, `/api/settings`, `GET /api/pages/:key`, `GET /api/reviews/mine` |
 | Admin | `/api/admin/dashboard`, `/api/admin/books`, `/api/admin/orders`, `/api/admin/inventory`, `/api/admin/reviews`, `/api/admin/coupons`, `/api/admin/cms/*`, `/api/admin/users`, `/api/admin/reports` |
-| Webhooks | `POST /api/webhooks/stripe` — signature verified before any state change |
+| Webhooks | `POST /api/payments/webhook` — raw payload signature verified before any state change |
 
 Full request/response details are in [docs/API.md](docs/API.md).
 
@@ -350,16 +350,16 @@ The production Vite build reports a non-fatal chunk-size warning for the Rechart
 
 ## Deployment notes
 
-The fastest free deployment is **Render Web Service + MongoDB Atlas**, using the included `render.yaml` Blueprint. It serves the API and built client from one HTTPS domain, so refresh cookies and CORS work without extra configuration.
+The recommended free deployment is **Netlify + MongoDB Atlas**. Netlify is free, does not require a credit card, allows commercial projects, and serves the built client plus the Express API from one HTTPS domain via `netlify/functions/api.js`. Refresh cookies and CORS work without extra configuration.
 
 1. Create a free MongoDB Atlas cluster and copy its SRV connection string.
-2. In Render, choose **New + → Blueprint** and select this repository. Paste the Atlas URI when prompted; JWT secrets are generated automatically.
-3. Render runs `npm install && npm run build`, then `npm start`. The liveness probe uses `/api/health`.
-4. Open **Shell** in the Render dashboard and run `npm run seed`, then `npm run seed:demo`.
-5. Open the Render URL and verify the storefront, checkout, admin login and Arabic RTL.
-6. For real payments/email/uploads, add Stripe, SMTP and Cloudinary credentials and configure the Stripe webhook at `https://<domain>/api/webhooks/stripe`.
+2. Import this repository into Netlify. `netlify.toml` sets the build command, publish directory, functions directory and Node version.
+3. Add `NODE_ENV=production`, `MONGO_URI` and two distinct JWT secrets in Netlify's environment variables.
+4. Run `npm run seed` and `npm run seed:demo` locally against the Atlas URI to populate the live database.
+5. Open the Netlify URL and verify the storefront, checkout, admin login and Arabic RTL.
+6. For real payments/email/uploads, add Stripe, SMTP and Cloudinary credentials and configure the Stripe webhook at `https://<domain>/api/payments/webhook`.
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for exact Atlas/Render steps, the full environment-variable table, Vercel/Netlify tradeoffs and post-deploy checks. Do not commit `.env`, uploads or build output; they are excluded by `.gitignore`.
+See [DEPLOYMENT.md](DEPLOYMENT.md) for exact Atlas/Netlify steps, the full environment-variable table, why Render/Vercel were not chosen and post-deploy checks. Do not commit `.env`, uploads or build output; they are excluded by `.gitignore`.
 
 ---
 

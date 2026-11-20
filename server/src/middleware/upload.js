@@ -2,6 +2,7 @@ import multer from 'multer';
 import path from 'node:path';
 import fs from 'node:fs';
 import { cloudinary, cloudinaryEnabled } from '../config/cloudinary.js';
+import { env } from '../config/env.js';
 import { badRequest } from '../utils/apiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
@@ -29,6 +30,10 @@ async function storeFile(file, folder) {
       stream.end(file.buffer);
     });
     return { url: result.secure_url, publicId: result.public_id };
+  }
+
+  if (env.isServerless) {
+    throw badRequest('Configure Cloudinary to upload images in serverless hosting');
   }
 
   const dir = path.resolve(process.cwd(), 'uploads', folder);
