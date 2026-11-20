@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 88" role="img" aria-label="The Reading Room">
+  <g transform="translate(6 10)">
+    <rect width="68" height="68" rx="17" fill="#783D45"/>
+    <path d="M14 21.5c6.8-2.6 13.2-1.8 20.2 2.3v25.5c-7-4.1-13.4-4.9-20.2-2.3v-25.5Z" fill="none" stroke="#F0EDE6" stroke-width="2.8" stroke-linejoin="round"/>
+    <path d="M54 21.5c-6.8-2.6-13.2-1.8-20.2 2.3v25.5c7-4.1 13.4-4.9 20.2-2.3v-25.5Z" fill="none" stroke="#F0EDE6" stroke-width="2.8" stroke-linejoin="round"/>
+    <path d="M34 24v25.5" fill="none" stroke="#B89B64" stroke-width="2.3" stroke-linecap="round"/>
+    <g fill="none" stroke="#D6C39A" stroke-width="1.6" stroke-linecap="round" opacity=".9">
+      <path d="M20 30c3.4-1 6.8-.6 9.8.9"/>
+      <path d="M20 36.7c3.4-1 6.8-.6 9.8.9"/>
+      <path d="M48 30c-3.4-1-6.8-.6-9.8.9"/>
+      <path d="M48 36.7c-3.4-1-6.8-.6-9.8.9"/>
+    </g>
+    <circle cx="34" cy="15" r="2.2" fill="#B89B64"/>
+  </g>
+  <g font-family="Georgia, 'Times New Roman', serif">
+    <text x="94" y="39" font-size="13" letter-spacing="4.6" fill="#B89B64">THE</text>
+    <text x="94" y="72" font-size="37" font-weight="600" letter-spacing="-.5" fill="#242424">Reading</text>
+    <text x="213" y="72" font-size="37" font-weight="600" letter-spacing="-.5" fill="#783D45">Room</text>
+  </g>
+  <path d="M94 80h232" stroke="#E6E2D9" stroke-width="2"/>
+</svg>
