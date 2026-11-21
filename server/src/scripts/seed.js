@@ -15,10 +15,10 @@ import { Coupon } from '../models/Coupon.js';
 import { CMSPage, HomepageSection, Banner, Testimonial } from '../models/Content.js';
 import { slugify } from '../utils/slugify.js';
 import {
-  createAuthorAvatar,
   createCategoryImage,
   createPublisherLogo,
 } from '../utils/taxonomyArtwork.js';
+import { authorPhotoUrl } from '../utils/realCatalogImages.js';
 
 const BOOK_COVERS = {
   'the-alchemist': 'https://covers.openlibrary.org/b/id/14846382-L.jpg?default=false',
@@ -120,7 +120,7 @@ async function seed() {
       { slug: slugify(name) },
       {
         name,
-        photo: createAuthorAvatar(name),
+        photo: authorPhotoUrl(name),
         biography: { en: `${name} is a celebrated author whose work has inspired readers worldwide.`, fr: `${name} est un auteur célébré dont l'œuvre a inspiré des lecteurs du monde entier.`, ar: `${name} كاتب مشهور ألهمت أعماله قرّاء في جميع أنحاء العالم.` },
       },
       { upsert: true, new: true },

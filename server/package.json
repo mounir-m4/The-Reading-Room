@@ -9,6 +9,8 @@
     "seed": "node src/scripts/seed.js",
     "seed:demo": "node src/scripts/seedDemo.js",
     "seed:taxonomy-images": "node src/scripts/seedTaxonomyImages.js",
+    "catalog:real-demo:check": "node src/scripts/replaceDemoBooks.js --dry-run",
+    "catalog:real-demo": "node src/scripts/replaceDemoBooks.js",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "lint": "eslint src"

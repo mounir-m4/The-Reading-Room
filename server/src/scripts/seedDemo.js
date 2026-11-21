@@ -24,12 +24,12 @@ import {
   ExchangeRate,
 } from '../models/Operations.js';
 import { Banner, CMSPage, HomepageSection, NewsletterSubscriber, Testimonial } from '../models/Content.js';
-import { createDemoBookCover } from '../utils/demoBookCover.js';
 import {
-  createAuthorAvatar,
   createCategoryImage,
   createPublisherLogo,
 } from '../utils/taxonomyArtwork.js';
+import { authorPhotoUrl, bookCoverUrl } from '../utils/realCatalogImages.js';
+import { LEGACY_DEMO_AUTHORS, REAL_DEMO_BOOKS } from './realDemoBooks.js';
 
 const ROLES = [
   { name: 'Super Admin', slug: 'super-admin', permissions: PERMISSIONS },
@@ -51,11 +51,7 @@ const EXTRA_CATEGORIES = [
   { en: 'Biography', fr: 'Biographie', ar: 'السيرة الذاتية' },
 ];
 
-const EXTRA_AUTHORS = [
-  'Nancy Haddad', 'Amine Belkacem', 'Clara Moreau', 'Yasmin Rahmani',
-  'Tomás Vega', 'Leila Ibnou', 'Hugo Marchand', 'Priya Shah',
-  'Malik Diop', 'Sophie Laurent', 'Karim Nasser', 'Elena Rossi',
-];
+const EXTRA_AUTHORS = [...new Set(REAL_DEMO_BOOKS.map((book) => book.author))];
 
 const EXTRA_PUBLISHERS = [
   { name: 'Atlas House', email: 'hello@atlashouse.test' },
@@ -66,27 +62,6 @@ const EXTRA_PUBLISHERS = [
   { name: 'Sahara Books', email: 'contact@saharabooks.test' },
   { name: 'Bluebird Editions', email: 'info@bluebird.test' },
   { name: 'Cedar House', email: 'press@cedarhouse.test' },
-];
-
-const EXTRA_BOOKS = [
-  { title: { en: 'The Garden of Forgotten Letters', fr: 'Le Jardin des lettres oubliées', ar: 'حديقة الرسائل المنسية' }, author: 'Nancy Haddad', category: 'Fantasy', publisher: 'Atlas House', price: 14900, compare: 18500, stock: 27, year: 2019, tags: ['fantasy', 'bestseller'] },
-  { title: { en: 'Atlas of Small Adventures', fr: 'Atlas des petites aventures', ar: 'أطلس المغامرات الصغيرة' }, author: 'Amine Belkacem', category: 'Travel', publisher: 'Sahara Books', price: 13500, compare: 0, stock: 4, year: 2021, tags: ['travel', 'new'] },
-  { title: { en: 'The Last Lighthouse Keeper', fr: 'Le Dernier Gardien du phare', ar: 'حارس المنارة الأخير' }, author: 'Clara Moreau', category: 'Fiction', publisher: 'Éditions Lumière', price: 16500, compare: 19500, stock: 19, year: 2017, tags: ['fiction', 'literary'] },
-  { title: { en: 'Algorithms of the Heart', fr: 'Les Algorithmes du cœur', ar: 'خوارزميات القلب' }, author: 'Yasmin Rahmani', category: 'Technology', publisher: 'Northwind Press', price: 19800, compare: 23000, stock: 11, year: 2023, tags: ['technology', 'new'] },
-  { title: { en: 'A Table for Twelve', fr: 'Une table pour douze', ar: 'طاولة لاثني عشر' }, author: 'Tomás Vega', category: 'Cooking', publisher: 'Maple & Ink', price: 22000, compare: 25500, stock: 33, year: 2020, tags: ['cooking', 'gift'] },
-  { title: { en: 'The Blue Hour', fr: 'L’Heure bleue', ar: 'الساعة الزرقاء' }, author: 'Sophie Laurent', category: 'Romance', publisher: 'Bluebird Editions', price: 11900, compare: 14900, stock: 22, year: 2018, tags: ['romance', 'bestseller'] },
-  { title: { en: 'Shadows in Marrakech', fr: 'Ombres à Marrakech', ar: 'ظلال في مراكش' }, author: 'Karim Nasser', category: 'Mystery', publisher: "Dar Al-Ma'rifa", price: 14200, compare: 0, stock: 7, year: 2022, tags: ['mystery', 'new'] },
-  { title: { en: 'The Quantum Library', fr: 'La Bibliothèque quantique', ar: 'المكتبة الكمية' }, author: 'Hugo Marchand', category: 'Science Fiction', publisher: 'Northwind Press', price: 17900, compare: 21000, stock: 15, year: 2024, tags: ['scifi', 'new'] },
-  { title: { en: 'Poems for the Long Way Home', fr: 'Poèmes pour le long retour', ar: 'قصائد للطريق الطويل إلى البيت' }, author: 'Leila Ibnou', category: 'Poetry', publisher: 'Cedar House', price: 9500, compare: 12000, stock: 41, year: 2016, tags: ['poetry'] },
-  { title: { en: "The Cartographer's Daughter", fr: 'La Fille du cartographe', ar: 'ابنة الجغرافي' }, author: 'Elena Rossi', category: 'History', publisher: 'Atlas House', price: 18900, compare: 0, stock: 2, year: 2015, tags: ['history'] },
-  { title: { en: 'Quiet Leadership', fr: 'Le Leadership discret', ar: 'القيادة الهادئة' }, author: 'Priya Shah', category: 'Business', publisher: 'Maple & Ink', price: 17600, compare: 20500, stock: 18, year: 2021, tags: ['business', 'productivity'] },
-  { title: { en: 'The Stars Above Us', fr: 'Les Étoiles au-dessus de nous', ar: 'النجوم فوقنا' }, author: 'Malik Diop', category: 'Science Fiction', publisher: 'Sahara Books', price: 15900, compare: 0, stock: 9, year: 2023, tags: ['scifi', 'new'] },
-  { title: { en: 'Bread and Orange Blossom', fr: 'Pain et fleur d’oranger', ar: 'الخبز وزهر البرتقال' }, author: 'Nancy Haddad', category: 'Cooking', publisher: "Dar Al-Ma'rifa", price: 12800, compare: 15500, stock: 26, year: 2019, tags: ['cooking'] },
-  { title: { en: 'The Silent Witness', fr: 'Le Témoin silencieux', ar: 'الشاهد الصامت' }, author: 'Clara Moreau', category: 'Mystery', publisher: 'Bluebird Editions', price: 13800, compare: 0, stock: 0, year: 2020, tags: ['mystery', 'thriller'] },
-  { title: { en: 'Letters to My Future Self', fr: 'Lettres à mon futur moi', ar: 'رسائل إلى نفسي المستقبلية' }, author: 'Yasmin Rahmani', category: 'Self Help', publisher: 'Cedar House', price: 11200, compare: 14000, stock: 35, year: 2022, tags: ['selfhelp', 'gift'] },
-  { title: { en: 'The Wooden Boat', fr: 'Le Bateau en bois', ar: 'القارب الخشبي' }, author: 'Amine Belkacem', category: 'Children', publisher: 'Éditions Lumière', price: 7900, compare: 9900, stock: 48, year: 2014, tags: ['children', 'classic'] },
-  { title: { en: 'A Brief History of Coffee', fr: 'Une brève histoire du café', ar: 'تاريخ مختصر للقهوة' }, author: 'Tomás Vega', category: 'History', publisher: 'Atlas House', price: 15400, compare: 0, stock: 6, year: 2018, tags: ['history', 'food'] },
-  { title: { en: 'The Glass Kingdom', fr: 'Le Royaume de verre', ar: 'المملكة الزجاجية' }, author: 'Elena Rossi', category: 'Fantasy', publisher: 'Northwind Press', price: 21000, compare: 24500, stock: 13, year: 2024, tags: ['fantasy', 'new'] },
 ];
 
 const PHOTOS = [
@@ -296,24 +271,26 @@ async function seedCatalog() {
     );
   }
 
-  for (const [i, name] of EXTRA_AUTHORS.entries()) {
+  for (const name of EXTRA_AUTHORS) {
     await Author.findOneAndUpdate(
       { slug: slugify(name) },
       {
         name,
-        photo: createAuthorAvatar(name),
+        photo: authorPhotoUrl(name),
         biography: {
-          en: `${name} writes stories that explore memory, place and the people we become.`,
-          fr: `${name} écrit des histoires qui explorent la mémoire, les lieux et notre devenir.`,
-          ar: `يكتب ${name} قصصاً تستكشف الذاكرة والأماكن وتحولات الإنسان.`,
+          en: `Discover books by ${name} in our curated collection.`,
+          fr: `Découvrez les livres de ${name} dans notre collection.`,
+          ar: `اكتشف كتب ${name} ضمن مجموعتنا المختارة.`,
         },
-        nationality: pick(['Morocco', 'France', 'United Kingdom', 'Spain', 'Italy', 'India']),
-        birthDate: new Date(`${1955 + (i % 30)}-0${1 + (i % 9)}-1${i % 9}`),
         isActive: true,
       },
       { upsert: true, new: true },
     );
   }
+  await Author.updateMany(
+    { name: { $in: LEGACY_DEMO_AUTHORS } },
+    { $set: { isActive: false }, $unset: { photo: '' } },
+  );
 
   for (const publisher of EXTRA_PUBLISHERS) {
     await Publisher.findOneAndUpdate(
@@ -333,61 +310,67 @@ async function seedCatalog() {
 
   const categories = await Category.find().lean();
   const authors = await Author.find().lean();
-  const publishers = await Publisher.find().lean();
   const categoryMap = Object.fromEntries(categories.map((c) => [c.name?.en, c._id]));
   const authorMap = Object.fromEntries(authors.map((a) => [a.name, a._id]));
-  const publisherMap = Object.fromEntries(publishers.map((p) => [p.name, p._id]));
 
-  for (const [i, item] of EXTRA_BOOKS.entries()) {
+  for (const [i, item] of REAL_DEMO_BOOKS.entries()) {
     const slug = slugify(item.title.en);
-    const coverImage = createDemoBookCover(item.title.en, item.author);
+    const coverImage = bookCoverUrl(item.coverId);
+    const existing = await Book.findOne({ slug: item.legacySlug }) || await Book.findOne({ slug });
+    const categoryId = categoryMap[item.category];
+    const authorId = authorMap[item.author];
+    if (!categoryId || !authorId) {
+      throw new Error(`Missing category or author while seeding "${item.title.en}"`);
+    }
     const discountPercent = item.compare > item.price
       ? Math.round((1 - item.price / item.compare) * 100)
       : 0;
     const created = daysAgo(int(20, 240));
     const doc = await Book.findOneAndUpdate(
-      { slug },
+      existing ? { _id: existing._id } : { slug },
       {
-        title: item.title,
-        subtitle: {
-          en: 'A specially selected edition for our readers',
-          fr: 'Une édition spécialement choisie pour nos lecteurs',
-          ar: 'طبعة مختارة خصيصاً لقرّائنا',
+        $set: {
+          title: item.title,
+          subtitle: {
+            en: 'A specially selected edition for our readers',
+            fr: 'Une édition spécialement choisie pour nos lecteurs',
+            ar: 'طبعة مختارة خصيصاً لقرّائنا',
+          },
+          slug,
+          author: authorId,
+          categories: [categoryId],
+          publisher: null,
+          publicationDate: new Date(`${item.year}-01-01`),
+          pages: 180 + i * 11,
+          language: 'en',
+          description: {
+            en: `${item.title.en} by ${item.author}, first published in ${item.year}.`,
+            fr: `${item.title.fr} de ${item.author}, publié pour la première fois en ${item.year}.`,
+            ar: `${item.title.ar} للكاتب ${item.author}، نُشر لأول مرة عام ${item.year}.`,
+          },
+          coverImage,
+          images: [coverImage],
+          price: item.price,
+          compareAtPrice: item.compare,
+          discountPercent,
+          stock: item.stock,
+          lowStockThreshold: i % 4 === 0 ? 8 : 5,
+          featured: i < 6,
+          bestSeller: i % 3 === 0,
+          newArrival: item.year >= 2022,
+          trending: i % 2 === 0,
+          isPublished: true,
+          ratingAverage: Number((4 + (i % 9) / 10).toFixed(1)),
+          ratingCount: 18 + i * 5,
+          views: 120 + i * 37,
+          soldCount: 55 + i * 19,
+          tags: item.tags,
+          seo: {
+            title: { en: `${item.title.en} — The Reading Room` },
+            description: { en: `Buy ${item.title.en} by ${item.author} online in Morocco.` },
+          },
         },
-        slug,
-        isbn: `978-${String(2100000000000 + i * 7919)}`,
-        author: authorMap[item.author],
-        categories: [categoryMap[item.category]].filter(Boolean),
-        publisher: publisherMap[item.publisher],
-        publicationDate: new Date(`${item.year}-0${1 + (i % 9)}-15`),
-        pages: 180 + i * 11,
-        language: 'en',
-        description: {
-          en: `${item.title.en} by ${item.author} is a memorable read from ${item.publisher}, now available in our curated collection.`,
-          fr: `${item.title.fr} de ${item.author} est une lecture mémorable publiée par ${item.publisher}, disponible dans notre sélection.`,
-          ar: `${item.title.ar} للكاتب ${item.author} قراءة مميزة صدرت عن ${item.publisher}، وهي متاحة الآن في مجموعتنا المختارة.`,
-        },
-        coverImage,
-        images: [coverImage],
-        price: item.price,
-        compareAtPrice: item.compare,
-        discountPercent,
-        stock: item.stock,
-        lowStockThreshold: i % 4 === 0 ? 8 : 5,
-        featured: i < 6,
-        bestSeller: i % 3 === 0,
-        newArrival: item.year >= 2022,
-        trending: i % 2 === 0,
-        isPublished: true,
-        ratingAverage: Number((4 + (i % 9) / 10).toFixed(1)),
-        ratingCount: 18 + i * 5,
-        views: 120 + i * 37,
-        soldCount: 55 + i * 19,
-        tags: item.tags,
-        seo: {
-          title: { en: `${item.title.en} — The Reading Room` },
-          description: { en: `Buy ${item.title.en} by ${item.author} online in Morocco.` },
-        },
+        $unset: { isbn: '' },
       },
       { upsert: true, new: true },
     );

@@ -4,21 +4,13 @@ import { logger } from '../utils/logger.js';
 import { Author } from '../models/Author.js';
 import { Category } from '../models/Category.js';
 import { Publisher } from '../models/Publisher.js';
-import {
-  createAuthorAvatar,
-  createCategoryImage,
-  createPublisherLogo,
-} from '../utils/taxonomyArtwork.js';
+import { createCategoryImage, createPublisherLogo } from '../utils/taxonomyArtwork.js';
+import { authorPhotoUrl, hasAuthorPhoto } from '../utils/realCatalogImages.js';
+import { LEGACY_DEMO_AUTHORS } from './realDemoBooks.js';
 
-const LEGACY_AUTHOR_PHOTOS = new Set([
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&q=80',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&q=80',
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&q=80',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80',
-  'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&q=80',
-]);
 const refreshGenerated = process.argv.includes('--refresh-generated');
 const isGeneratedArtwork = (image) => image?.startsWith('data:image/svg+xml;charset=UTF-8,');
+const legacyAuthors = new Set(LEGACY_DEMO_AUTHORS);
 
 async function seedTaxonomyImages() {
   await connectDatabase();
@@ -33,13 +25,23 @@ async function seedTaxonomyImages() {
     counts.categories += 1;
   }
 
-  for (const author of await Author.find().select('name photo').lean()) {
-    if (author.photo && !LEGACY_AUTHOR_PHOTOS.has(author.photo)
-      && !(refreshGenerated && isGeneratedArtwork(author.photo))) continue;
-    await Author.updateOne(
-      { _id: author._id },
-      { $set: { photo: createAuthorAvatar(author.name) } },
-    );
+  for (const author of await Author.find().select('name photo isActive').lean()) {
+    if (hasAuthorPhoto(author.name)) {
+      const photo = authorPhotoUrl(author.name);
+      if (author.photo === photo && author.isActive !== false) continue;
+      await Author.updateOne(
+        { _id: author._id },
+        { $set: { photo, isActive: true } },
+      );
+    } else if (legacyAuthors.has(author.name)) {
+      if (author.isActive === false && !author.photo) continue;
+      await Author.updateOne(
+        { _id: author._id },
+        { $set: { isActive: false }, $unset: { photo: '' } },
+      );
+    } else {
+      continue;
+    }
     counts.authors += 1;
   }
 

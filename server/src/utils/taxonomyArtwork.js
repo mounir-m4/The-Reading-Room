@@ -53,13 +53,6 @@ export function createCategoryImage(name) {
   return toSvgDataUri(svg);
 }
 
-export function createAuthorAvatar(name) {
-  const [background, accent, paper] = paletteFor(`author:${name}`);
-  const initials = escapeXml(initialsFor(name));
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><rect width="400" height="400" rx="200" fill="${background}"/><circle cx="200" cy="200" r="174" fill="none" stroke="${accent}" stroke-width="4"/><circle cx="200" cy="145" r="62" fill="${accent}" opacity=".24"/><path d="M82 330 Q100 228 200 228 T318 330 V350 H82Z" fill="${accent}" opacity=".24"/><text x="200" y="222" fill="${paper}" font-family="Georgia,serif" font-size="104" text-anchor="middle">${initials}</text><path d="M72 282 Q200 245 328 282" fill="none" stroke="${accent}" stroke-width="3" opacity=".8"/></svg>`;
-  return toSvgDataUri(svg);
-}
-
 export function createPublisherLogo(name) {
   const [background, accent, paper] = paletteFor(`publisher:${name}`);
   const initials = escapeXml(initialsFor(name));
