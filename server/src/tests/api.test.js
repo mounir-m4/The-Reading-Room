@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import request from 'supertest';
 import mongoose from 'mongoose';
 import { createApp } from '../app.js';
+import * as database from '../config/database.js';
 import { connectDatabase, disconnectDatabase } from '../config/database.js';
 import { Role, PERMISSIONS } from '../models/Role.js';
 import { Admin } from '../models/Admin.js';
@@ -11,6 +12,7 @@ import { Book } from '../models/Book.js';
 import { Coupon } from '../models/Coupon.js';
 
 const app = createApp();
+const originalVercel = process.env.VERCEL;
 let adminToken;
 let userToken;
 let bookId;
@@ -40,7 +42,41 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  if (originalVercel === undefined) delete process.env.VERCEL;
+  else process.env.VERCEL = originalVercel;
   await disconnectDatabase();
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  if (originalVercel === undefined) delete process.env.VERCEL;
+  else process.env.VERCEL = originalVercel;
+});
+
+const getVercelApp = async () => (await import('../../../index.js')).default;
+
+describe('Vercel API hosting', () => {
+  it('serves the health endpoint without connecting to MongoDB', async () => {
+    process.env.VERCEL = '1';
+    const vercelApp = await getVercelApp();
+    const connectSpy = vi.spyOn(database, 'connectDatabase');
+    const response = await request(vercelApp).get('/api/health');
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.status).toBe('ok');
+    expect(connectSpy).not.toHaveBeenCalled();
+  });
+
+  it('connects to MongoDB before serving the catalogue', async () => {
+    process.env.VERCEL = '1';
+    const vercelApp = await getVercelApp();
+    const connectSpy = vi.spyOn(database, 'connectDatabase');
+    const response = await request(vercelApp).get('/api/books?currency=USD');
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.length).toBeGreaterThan(0);
+    expect(connectSpy).toHaveBeenCalledOnce();
+  });
 });
 
 describe('Authentication', () => {

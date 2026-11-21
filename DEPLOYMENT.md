@@ -1,18 +1,18 @@
 # Deploying The Reading Room
 
-## Recommended free stack
+## Deployment options
 
 | Layer | Platform | Why |
 | --- | --- | --- |
-| Static client + API | **Netlify** | Free forever, **no credit card required**, allows commercial projects, built-in HTTPS and serverless functions. |
+| Static client + API | **Netlify** | Supports commercial projects and built-in HTTPS/serverless functions. Its Free plan has a monthly credit limit. |
 | Database | **MongoDB Atlas** | Free shared M0 cluster. |
-| Domain | Netlify subdomain | `https://<site>.netlify.app` is included; custom domains are free too. |
+| Testing deployment | **Vercel Hobby** | Free and card-free for personal, non-commercial testing. |
 
-Netlify hosts the Vite build as static files and runs the Express API as a serverless function through `netlify/functions/api.js`. A single Netlify domain means refresh cookies, CORS and client-side routing work without a separate backend host.
+Netlify hosts the Vite build as static files and runs the Express API as a serverless function through `netlify/functions/api.js`. A single Netlify domain means refresh cookies, CORS and client-side routing work without a separate backend host. Vercel Hobby is an alternative for this project’s personal testing only; its terms do not allow commercial use.
 
 > **Why not Render?** Render currently asks for a credit card to verify identity, so it does not fit your requirement.
 >
-> **Why not Vercel?** Vercel Hobby is free and card-free, but its terms restrict it to non-commercial personal use. A bookstore that takes payments would need the paid Pro plan.
+> **Vercel for testing:** Vercel Hobby is free and card-free, but its terms restrict it to non-commercial personal use. Do not use it for a commercial bookstore.
 >
 > **Why not Cloudflare Workers?** It is a good free platform, but this Express app needs Node compatibility, a Durable Object for database connections and more invasive changes than Netlify.
 
@@ -20,7 +20,28 @@ Free-tier caveats:
 
 - Netlify's new credit-based Free plan includes **300 credits/month** with a hard limit. A production deploy costs 15 credits, bandwidth 20 credits/GB and web requests 2 credits per 10,000. When credits run out, all sites on the account pause until the next billing cycle.
 - Netlify Functions are serverless: uploads need Cloudinary because the filesystem is read-only. The seeded demo books use external Unsplash images, so the demo works without it.
+- Vercel Hobby has its own usage limits and is for personal, non-commercial testing only.
 - Atlas free clusters can pause after prolonged inactivity and resume on the next request.
+
+---
+
+## Deploy on Vercel Hobby for testing
+
+The repository includes `vercel.json` and a root Express entrypoint. Vercel builds the Vite client into `client/dist`, serves it from the same domain, and routes non-asset SPA paths to `index.html`. The Express app handles `/api/*`; `/api/health` does not require MongoDB, while other API requests connect to Atlas.
+
+1. Import `mounir-m4/The-Reading-Room` into Vercel and keep the project root at the repository root.
+2. Use the Hobby plan for personal testing only.
+3. In **Project Settings → Environment Variables**, set the variables in the table below for **Production** (and Preview if you plan to use preview deployments):
+   - `NODE_ENV=production`
+   - `MONGO_URI` (your Atlas connection string)
+   - `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` (two distinct, long random values)
+   - `CLIENT_URL` (the deployed Vercel URL, if automatic URL detection is not available)
+4. Deploy the project. Vercel reads the build command and output directory from `vercel.json`.
+5. Verify `/api/health`, then check the storefront and `/api/books`.
+
+Do not paste secrets into chat or commit them to GitHub. Enter them directly in Vercel’s Environment Variables settings. Seed the Atlas database using the local shell instructions above if the selected database is empty. Optional payment, email and image-upload integrations require their corresponding credentials; keep real payments disabled for a test deployment.
+
+The Vercel Hobby plan is not suitable for a commercial bookstore. Keep the existing Netlify project if you want to retain its current published site; deploying to Vercel does not require deleting it.
 
 ---
 

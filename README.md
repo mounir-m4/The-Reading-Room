@@ -350,7 +350,7 @@ The production Vite build reports a non-fatal chunk-size warning for the Rechart
 
 ## Deployment notes
 
-The recommended free deployment is **Netlify + MongoDB Atlas**. Netlify is free, does not require a credit card, allows commercial projects, and serves the built client plus the Express API from one HTTPS domain via `netlify/functions/api.js`. Refresh cookies and CORS work without extra configuration.
+The standard deployment is **Netlify + MongoDB Atlas**. Netlify serves the built client plus the Express API from one HTTPS domain via `netlify/functions/api.js`. Its Free plan has a monthly credit limit, so production deploys may pause when the account runs out of credits.
 
 1. Create a free MongoDB Atlas cluster and copy its SRV connection string.
 2. Import this repository into Netlify. `netlify.toml` sets the build command, publish directory, functions directory and Node version.
@@ -359,7 +359,7 @@ The recommended free deployment is **Netlify + MongoDB Atlas**. Netlify is free,
 5. Open the Netlify URL and verify the storefront, checkout, admin login and Arabic RTL.
 6. For real payments/email/uploads, add Stripe, SMTP and Cloudinary credentials and configure the Stripe webhook at `https://<domain>/api/payments/webhook`.
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for exact Atlas/Netlify steps, the full environment-variable table, why Render/Vercel were not chosen and post-deploy checks. Do not commit `.env`, uploads or build output; they are excluded by `.gitignore`.
+For personal, non-commercial testing, the repository also supports **Vercel Hobby** with the existing `/api` routes. Hobby terms do not allow commercial use. See [DEPLOYMENT.md](DEPLOYMENT.md) for Atlas/Netlify instructions, Vercel testing setup, environment variables and post-deploy checks. Do not commit `.env`, uploads or build output; they are excluded by `.gitignore`.
 
 ---
 

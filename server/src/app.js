@@ -4,6 +4,7 @@ import cors from 'cors';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
+import { connectDatabase } from './config/database.js';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -39,6 +40,17 @@ export function createApp() {
   }));
   app.use(express.urlencoded({ extended: true, limit: '2mb' }));
   app.use(sanitizeInput);
+  if (process.env.VERCEL) {
+    app.use('/api', async (req, _res, next) => {
+      if (req.path === '/health') return next();
+      try {
+        await connectDatabase();
+        next();
+      } catch (error) {
+        next(error);
+      }
+    });
+  }
   app.use('/api', apiLimiter, routes);
 
   // Local uploads are unavailable on read-only serverless filesystems.
