@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+const isVercel = Boolean(process.env.VERCEL);
+
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -11,7 +13,8 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'dist',
+    outDir: isVercel ? '../public' : 'dist',
+    emptyOutDir: isVercel,
     sourcemap: false,
     rollupOptions: {
       output: {
