@@ -1,46 +1,21 @@
 # Deploying The Reading Room
 
-## Deployment options
+The live app is hosted on **Vercel** with **MongoDB Atlas**.
 
-| Layer | Platform | Why |
+## Architecture
+
+| Layer | Platform | Notes |
 | --- | --- | --- |
-| Static client + API | **Netlify** | Supports commercial projects and built-in HTTPS/serverless functions. Its Free plan has a monthly credit limit. |
-| Database | **MongoDB Atlas** | Free shared M0 cluster. |
-| Testing deployment | **Vercel Hobby** | Free and card-free for personal, non-commercial testing. |
+| Static client + API | Vercel | `vercel.json` builds the Vite client and rewrites API/SEO routes to `api/index.js`. |
+| Database | MongoDB Atlas | Free shared M0 cluster. |
 
-Netlify hosts the Vite build as static files and runs the Express API as a serverless function through `netlify/functions/api.js`. A single Netlify domain means refresh cookies, CORS and client-side routing work without a separate backend host. Vercel Hobby is an alternative for this project’s personal testing only; its terms do not allow commercial use.
-
-> **Why not Render?** Render currently asks for a credit card to verify identity, so it does not fit your requirement.
->
-> **Vercel for testing:** Vercel Hobby is free and card-free, but its terms restrict it to non-commercial personal use. Do not use it for a commercial bookstore.
->
-> **Why not Cloudflare Workers?** It is a good free platform, but this Express app needs Node compatibility, a Durable Object for database connections and more invasive changes than Netlify.
+> **Vercel Hobby** is free and card-free, but its terms are for personal, non-commercial use.
 
 Free-tier caveats:
 
-- Netlify's new credit-based Free plan includes **300 credits/month** with a hard limit. A production deploy costs 15 credits, bandwidth 20 credits/GB and web requests 2 credits per 10,000. When credits run out, all sites on the account pause until the next billing cycle.
-- Netlify Functions are serverless: uploads need Cloudinary because the filesystem is read-only. The seeded demo books use external Unsplash images, so the demo works without it.
-- Vercel Hobby has its own usage limits and is for personal, non-commercial testing only.
+- Vercel Functions have a read-only filesystem. Admin image uploads need Cloudinary; the seeded demo books use external Unsplash images and work without it.
+- Vercel Hobby has its own usage limits and is not intended for commercial traffic.
 - Atlas free clusters can pause after prolonged inactivity and resume on the next request.
-
----
-
-## Deploy on Vercel Hobby for testing
-
-The repository includes `vercel.json` and a shared Express function in `api/index.js`. Vercel builds the Vite client into `client/dist` and serves its static files; API and SEO requests are rewritten to the shared Express function, while SPA routes fall back to `index.html`. `/api/health` does not require MongoDB, while other API requests connect to Atlas.
-
-1. Import `mounir-m4/The-Reading-Room` into Vercel and keep the project root at the repository root.
-2. Use the Hobby plan for personal testing only.
-3. In **Project Settings → Environment Variables**, set these variables for **Production** (and Preview if you plan to use preview deployments):
-   - `MONGO_URI` (your Atlas connection string)
-   - `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` (two distinct, long random values)
-   - `CLIENT_URL` (the deployed Vercel URL, if automatic URL detection is not available)
-4. Deploy the project. Vercel reads the framework, build command, output directory, and rewrites from `vercel.json`.
-5. Verify `/api/health`, then check the storefront and `/api/books`.
-
-Do not paste secrets into chat or commit them to GitHub. Enter them directly in Vercel’s Environment Variables settings. Seed the Atlas database using the local shell instructions above if the selected database is empty. Optional payment, email and image-upload integrations require their corresponding credentials; keep real payments disabled for a test deployment.
-
-The Vercel Hobby plan is not suitable for a commercial bookstore. Keep the existing Netlify project if you want to retain its current published site; deploying to Vercel does not require deleting it.
 
 ---
 
@@ -57,37 +32,32 @@ mongodb+srv://USER:PASSWORD@cluster.mongodb.net/the_reading_room?retryWrites=tru
 
 ---
 
-## 2. Deploy on Netlify
+## 2. Deploy on Vercel
 
-The repository already contains `netlify.toml` and the API function. Its `/api/*` rewrite preserves the API path when invoking the function, so Express can match routes such as `/api/health`.
+The repository includes `vercel.json` and the shared Express function in `api/index.js`. Vercel builds the Vite client into `client/dist`, serves its static files, rewrites API and SEO requests to the Express function, and falls back to `index.html` for SPA routes.
 
-1. Push your latest `main` branch to GitHub.
-2. In Netlify, click **Add new site → Import an existing project**.
-3. Choose GitHub and select `mounir-m4/The-Reading-Room`.
-4. Netlify reads `netlify.toml` automatically:
-   - **Build command:** `npm install && npm run build --workspace client`
-   - **Publish directory:** `client/dist`
-   - **Functions directory:** `netlify/functions`
-   - **Node version:** 20
-5. Add the environment variables below before deploying.
-6. Click **Deploy site**.
+1. Import `mounir-m4/The-Reading-Room` into Vercel and keep the project root at the repository root.
+2. Use the Hobby plan for personal testing.
+3. In **Project Settings → Environment Variables**, set these for **Production** (and Preview if you use preview deployments):
+   - `MONGO_URI` — the Atlas connection string from step 1
+   - `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` — two distinct, long random values
+   - `CLIENT_URL` — optional; defaults to the Vercel URL. Set it when using a custom domain.
+4. Deploy. Vercel reads the build command, output directory and rewrites from `vercel.json`.
+5. Verify `/api/health`, then check the storefront and `/api/books`.
 
-Netlify exposes the site URL as `URL`, and the server uses it automatically for CORS, sitemap links and secure cookies. You do not need to set `CLIENT_URL` unless you use a custom domain with a different hostname.
+Do not paste secrets into chat or commit them to GitHub. Enter them directly in Vercel's Environment Variables settings. Seed the Atlas database from your local shell using the instructions below if the selected database is empty. Optional payment, email and image-upload integrations require their corresponding credentials; keep real payments disabled for a test deployment.
 
 ---
 
 ## 3. Environment variables
 
-In **Site configuration → Environment variables**, add:
-
 | Variable | Required | Value |
 | --- | --- | --- |
-| `NODE_ENV` | Yes | `production` |
 | `MONGO_URI` | Yes | Atlas SRV connection string |
 | `MONGODB_DB` | No | Database containing the app data; defaults to `the_reading_room` |
 | `JWT_ACCESS_SECRET` | Yes | Long random value, different from the refresh secret |
 | `JWT_REFRESH_SECRET` | Yes | Long random value, different from the access secret |
-| `CLIENT_URL` | No | Defaults to the platform URL (`URL` on Netlify or `VERCEL_URL` on Vercel); set your custom domain if needed |
+| `CLIENT_URL` | No | Defaults to `VERCEL_URL`; set your custom domain if needed |
 | `MAIL_FROM` | No | `The Reading Room <hello@thereadingroom.test>` |
 | `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Recommended | Enables persistent admin image uploads |
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | No | Enables real email delivery |
@@ -99,15 +69,13 @@ Generate each JWT secret with:
 node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 ```
 
-The app refuses to start in production if JWT secrets are missing or still contain `change-me`. Vercel sets `VERCEL_ENV`; you do not need to add `NODE_ENV` there.
+The app refuses to start in production if JWT secrets are missing or still contain `change-me`. Vercel sets `VERCEL_ENV`, so you do not need to add `NODE_ENV` there.
 
 ---
 
 ## 4. Seed the live database
 
-The seed scripts must run against the Atlas database.
-
-### Option A — Local shell (easiest)
+Run the seed scripts locally against the Atlas database.
 
 **Windows PowerShell:**
 
@@ -124,10 +92,6 @@ MONGO_URI="mongodb+srv://USER:PASSWORD@cluster.mongodb.net/the_reading_room?retr
 MONGO_URI="mongodb+srv://USER:PASSWORD@cluster.mongodb.net/the_reading_room?retryWrites=true&w=majority" npm run seed:demo
 ```
 
-### Option B — Netlify build hook (one-time workaround)
-
-Temporarily create a separate branch that runs `npm run seed && npm run seed:demo` in the Netlify build command, deploy it once, then remove the branch/deploy. The local shell option is simpler and safer.
-
 `seed:demo` is idempotent and creates the full catalogue, orders and admin screens used in the README screenshots.
 
 > The demo credentials are public in `README.md`. That is acceptable for a demo, but before treating the site as a real store, change/remove those users and set `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` to private values before running `npm run seed`.
@@ -136,7 +100,7 @@ Temporarily create a separate branch that runs `npm run seed && npm run seed:dem
 
 ## 5. Verify the deployment
 
-1. Open the Netlify URL, e.g. `https://the-reading-room.netlify.app`.
+1. Open the live Vercel URL, e.g. <https://the-reading-room-pi-umber.vercel.app/>.
 2. Check `/api/health` returns `{"success":true,"data":{"status":"ok"}}`.
 3. Load the storefront, `/shop`, a book detail page, `/cart` and `/checkout`.
 4. Sign in with `reader@bookstore.test` / `Reader@12345` and place a test COD/mock order.
@@ -150,7 +114,7 @@ If the first request is slow, the serverless function and Atlas cluster are waki
 
 ## 6. Optional production upgrades
 
-- **Custom domain:** Netlify Free includes custom domains with automatic TLS. Add it under **Domain management**, then set `CLIENT_URL` to the custom domain if it differs from the Netlify URL.
+- **Custom domain:** Add it in Vercel's Domains settings, then set `CLIENT_URL` to that domain.
 - **Cloudinary:** Add the `CLOUDINARY_*` variables so uploaded images survive function restarts.
 - **SMTP:** Add SMTP variables so verification and order emails are delivered instead of logged.
 - **Stripe:** Add Stripe keys, set the webhook endpoint to `https://<your-domain>/api/payments/webhook`, and use `STRIPE_WEBHOOK_SECRET` from that endpoint.
@@ -166,18 +130,20 @@ npm.cmd test
 npm.cmd run build --workspace client
 ```
 
-You can also invoke the Netlify function locally with a fake event:
+You can also start the full local app and check the API:
 
 ```powershell
-$env:NETLIFY = "true"
-node --input-type=module -e "import('./netlify/functions/api.js').then(async m => { const r = await m.handler({ path: '/api/health', httpMethod: 'GET', headers: { 'x-forwarded-for': '127.0.0.1' }, queryStringParameters: {}, body: null, isBase64Encoded: false, requestContext: { identity: { sourceIp: '127.0.0.1' } } }, {}); console.log(r.statusCode, r.body); process.exit(0); })"
+npm.cmd start
 ```
 
-Expected output contains `200` and `{"success":true,"data":{"status":"ok"}}`.
+```text
+GET http://localhost:5000/api/health          -> {"success":true,"data":{"status":"ok"}}
+GET http://localhost:5000/api/books?limit=1   -> 200
+```
 
 ### Local DNS note
 
-If seeding or startup fails with `querySrv EREFUSED _mongodb._tcp.<cluster>.mongodb.net`, your local router/ISP DNS is refusing external SRV queries. The root npm scripts now load `scripts/dns-preload.mjs`, which points Node at public resolvers automatically. Netlify is unaffected.
+If seeding or startup fails with `querySrv EREFUSED _mongodb._tcp.<cluster>.mongodb.net`, your local router/ISP DNS is refusing external SRV queries. The root npm scripts load `scripts/dns-preload.mjs`, which points Node at public resolvers automatically. This only affects your local machine; deployed functions use their platform's DNS.
 
 To opt out and use your system DNS, set:
 

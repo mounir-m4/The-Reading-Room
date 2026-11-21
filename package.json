@@ -30,8 +30,5 @@
   "allowScripts": {
     "mongodb-memory-server@10.1.2": true,
     "esbuild@0.21.5": true
-  },
-  "dependencies": {
-    "serverless-http": "^4.0.0"
   }
 }

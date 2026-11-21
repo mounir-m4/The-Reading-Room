@@ -359,16 +359,16 @@ The production Vite build reports a non-fatal chunk-size warning for the Rechart
 
 ## Deployment notes
 
-The standard deployment is **Netlify + MongoDB Atlas**. Netlify serves the built client plus the Express API from one HTTPS domain via `netlify/functions/api.js`. Its Free plan has a monthly credit limit, so production deploys may pause when the account runs out of credits.
+The live deployment is **Vercel + MongoDB Atlas**. `vercel.json` builds the Vite client into `client/dist` and rewrites `/api/*` and generated SEO routes to the shared Express handler in `api/index.js`.
 
 1. Create a free MongoDB Atlas cluster and copy its SRV connection string.
-2. Import this repository into Netlify. `netlify.toml` sets the build command, publish directory, functions directory and Node version.
-3. Add `NODE_ENV=production`, `MONGO_URI` and two distinct JWT secrets in Netlify's environment variables.
+2. Import this repository into Vercel with the project root at the repository root.
+3. Add `MONGO_URI`, `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` in Vercel's environment variables.
 4. Run `npm run seed` and `npm run seed:demo` locally against the Atlas URI to populate the live database.
-5. Open the Netlify URL and verify the storefront, checkout, admin login and Arabic RTL.
+5. Open the Vercel URL and verify the storefront, checkout, admin login and Arabic RTL.
 6. For real payments/email/uploads, add Stripe, SMTP and Cloudinary credentials and configure the Stripe webhook at `https://<domain>/api/payments/webhook`.
 
-For personal, non-commercial testing, the repository also supports **Vercel Hobby** with the existing `/api` routes. Hobby terms do not allow commercial use. See [DEPLOYMENT.md](DEPLOYMENT.md) for Atlas/Netlify instructions, Vercel testing setup, environment variables and post-deploy checks. Do not commit `.env`, uploads or build output; they are excluded by `.gitignore`.
+See [DEPLOYMENT.md](DEPLOYMENT.md) for Atlas setup, environment variables and post-deploy checks. Do not commit `.env`, uploads or build output; they are excluded by `.gitignore`.
 
 ---
 

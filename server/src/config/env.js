@@ -22,14 +22,10 @@ export const env = {
   nodeEnv,
   isProduction,
   isTest: process.env.NODE_ENV === 'test',
-  isServerless: Boolean(
-    process.env.NETLIFY || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.CF_PAGES,
-  ),
+  isServerless: Boolean(process.env.VERCEL),
   port: number(process.env.PORT, 5000),
-  // Netlify exposes URL, Render exposes RENDER_EXTERNAL_URL, and Vercel exposes VERCEL_URL.
+  // Vercel exposes VERCEL_URL; CLIENT_URL takes precedence for custom domains.
   clientUrl: process.env.CLIENT_URL
-    || process.env.URL
-    || process.env.RENDER_EXTERNAL_URL
     || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined)
     || 'http://localhost:5173',
   mongoUri: process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/the_reading_room',
