@@ -10,14 +10,17 @@ const root = path.resolve(configDirectory, '../../..');
 dotenv.config({ path: path.join(root, '.env') });
 dotenv.config({ path: path.join(configDirectory, '../.env') });
 
+const nodeEnv = process.env.NODE_ENV || process.env.VERCEL_ENV || 'development';
+const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+
 const number = (value, fallback) => {
   const parsed = Number.parseInt(value ?? '', 10);
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
 export const env = {
-  nodeEnv: process.env.NODE_ENV || 'development',
-  isProduction: process.env.NODE_ENV === 'production',
+  nodeEnv,
+  isProduction,
   isTest: process.env.NODE_ENV === 'test',
   isServerless: Boolean(
     process.env.NETLIFY || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.CF_PAGES,

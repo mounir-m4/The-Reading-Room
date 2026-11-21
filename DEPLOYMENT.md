@@ -31,8 +31,7 @@ The repository includes `vercel.json` and a root Express entrypoint. Vercel buil
 
 1. Import `mounir-m4/The-Reading-Room` into Vercel and keep the project root at the repository root.
 2. Use the Hobby plan for personal testing only.
-3. In **Project Settings → Environment Variables**, set the variables in the table below for **Production** (and Preview if you plan to use preview deployments):
-   - `NODE_ENV=production`
+3. In **Project Settings → Environment Variables**, set these variables for **Production** (and Preview if you plan to use preview deployments):
    - `MONGO_URI` (your Atlas connection string)
    - `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` (two distinct, long random values)
    - `CLIENT_URL` (the deployed Vercel URL, if automatic URL detection is not available)
@@ -87,7 +86,7 @@ In **Site configuration → Environment variables**, add:
 | `MONGO_URI` | Yes | Atlas SRV connection string |
 | `JWT_ACCESS_SECRET` | Yes | Long random value, different from the refresh secret |
 | `JWT_REFRESH_SECRET` | Yes | Long random value, different from the access secret |
-| `CLIENT_URL` | No | Defaults to Netlify's `URL`; set to your custom domain if needed |
+| `CLIENT_URL` | No | Defaults to the platform URL (`URL` on Netlify or `VERCEL_URL` on Vercel); set your custom domain if needed |
 | `MAIL_FROM` | No | `The Reading Room <hello@thereadingroom.test>` |
 | `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Recommended | Enables persistent admin image uploads |
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | No | Enables real email delivery |
@@ -99,7 +98,7 @@ Generate each JWT secret with:
 node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 ```
 
-The app refuses to start in production if JWT secrets are missing or still contain `change-me`.
+The app refuses to start in production if JWT secrets are missing or still contain `change-me`. Vercel sets `VERCEL_ENV`; you do not need to add `NODE_ENV` there.
 
 ---
 
