@@ -16,10 +16,11 @@ export const handler = async (event, context) => {
     context.callbackWaitsForEmptyEventLoop = false;
   }
 
-  appHandler ||= serverless(createApp());
+  appHandler ||= serverless(createApp(), { basePath: '/.netlify/functions/api' });
 
   // The health probe should answer even if MongoDB is temporarily unavailable.
-  if (!event.path?.startsWith('/api/health')) await ensureDatabase();
+  const requestPath = event.requestPath || event.path || '';
+  if (!requestPath.endsWith('/api/health')) await ensureDatabase();
 
   return appHandler(event, context);
 };

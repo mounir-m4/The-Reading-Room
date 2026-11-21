@@ -39,7 +39,7 @@ mongodb+srv://USER:PASSWORD@cluster.mongodb.net/the_reading_room?retryWrites=tru
 
 ## 2. Deploy on Netlify
 
-The repository already contains `netlify.toml` and the API function.
+The repository already contains `netlify.toml` and the API function. Its `/api/*` rewrite preserves the API path when invoking the function, so Express can match routes such as `/api/health`.
 
 1. Push your latest `main` branch to GitHub.
 2. In Netlify, click **Add new site → Import an existing project**.

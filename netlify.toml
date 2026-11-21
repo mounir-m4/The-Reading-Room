@@ -9,7 +9,7 @@
 # API + generated SEO routes go to the Express function.
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/api"
+  to = "/.netlify/functions/api/api/:splat"
   status = 200
 
 [[redirects]]
