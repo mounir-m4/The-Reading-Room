@@ -24,7 +24,7 @@ export default function Footer() {
 
   return (
     <footer className="mt-20 border-t border-line bg-sand/70">
-      <div className="container-premium grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-5">
+      <div className="container-premium grid grid-cols-1 gap-10 py-14 md:grid-cols-2 lg:grid-cols-5">
         <div className="lg:col-span-2">
           <Link to="/" className="inline-flex" aria-label="The Reading Room home">
             <BrandLogo size="sm" />

@@ -41,7 +41,7 @@ export const REAL_DEMO_BOOKS = [
   {
     legacySlug: 'a-table-for-twelve',
     title: { en: 'Salt, Fat, Acid, Heat', fr: 'Sel, gras, acide, chaleur', ar: 'ملح ودهون وحمض وحرارة' },
-    author: 'Samin Nosrat', category: 'Cooking', coverUrl: 'https://books.google.com/books/content?id=yvqxDgAAQBAJ&printsec=frontcover&img=1&zoom=1', year: 2017,
+    author: 'Samin Nosrat', category: 'Cooking', coverId: 8315567, year: 2017,
     price: 22000, compare: 25500, stock: 33, tags: ['cooking', 'gift'],
   },
   {

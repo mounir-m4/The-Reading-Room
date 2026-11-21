@@ -18,6 +18,7 @@ const OPEN_LIBRARY_AUTHOR_PHOTOS = {
   'Arthur Conan Doyle': 5541405,
   'Douglas Adams': 6387387,
   'Rupi Kaur': 12404089,
+  'Anne Frank': 6458523,
   'Simon Sinek': 15164899,
   'Ray Bradbury': 14853852,
   'Julia Child': 14544019,
@@ -28,9 +29,12 @@ const OPEN_LIBRARY_AUTHOR_PHOTOS = {
   'George R. R. Martin': 6387401,
 };
 
+const OPEN_LIBRARY_AUTHOR_PHOTO_SIZES = {
+  'Anne Frank': 'M',
+};
+
 const DIRECT_AUTHOR_PHOTOS = {
-  'Morgan Housel': 'https://lh7-us.googleusercontent.com/sitesv-images-rt/APXyLQc_orRa0elLob3AvBc1Niph_V_0Pg2961dz46oqgDvajib4fqj_l2Yj-ixZ-W8aZQ72UiXPWPUZfgj-xPmU0SspKPHSL0mll5kc6GdElxjaOaaB4rXIfVHLU1_zrrUWCmqGV7w-mHzvif-3Hx2O0rm4Nz1kiez7F3tJzD70Z2h6XQIuWx5x_mySEZHVUhZ2DkCQ2TYNLu_RIfBBVIzwxCIWI7ODnJLiMpQmWUB69Mo=w1280',
-  'Anne Frank': 'https://www.annefrank.org/media/filer_public_thumbnails/filer_public/6d/ae/6daeac4a-591c-4499-aa83-dc6cdf215c3d/a_afrank_iii_055106.jpg__1536x1536_q85_subsampling-2.jpg',
+  'Morgan Housel': 'https://pbs.twimg.com/profile_images/1801821925414735875/O1lzFjAw_400x400.jpg',
 };
 
 export function hasAuthorPhoto(name) {
@@ -39,7 +43,10 @@ export function hasAuthorPhoto(name) {
 
 export function authorPhotoUrl(name) {
   const photoId = OPEN_LIBRARY_AUTHOR_PHOTOS[name];
-  if (photoId) return `https://covers.openlibrary.org/a/id/${photoId}-L.jpg?default=false`;
+  if (photoId) {
+    const size = OPEN_LIBRARY_AUTHOR_PHOTO_SIZES[name] || 'L';
+    return `https://covers.openlibrary.org/a/id/${photoId}-${size}.jpg?default=false`;
+  }
   if (DIRECT_AUTHOR_PHOTOS[name]) return DIRECT_AUTHOR_PHOTOS[name];
   throw new Error(`No verified author photo configured for "${name}"`);
 }
@@ -49,8 +56,4 @@ export function bookCoverUrl(coverId) {
     throw new Error(`Invalid Open Library cover ID: ${coverId}`);
   }
   return `https://covers.openlibrary.org/b/id/${coverId}-L.jpg?default=false`;
-}
-
-export function catalogBookCoverUrl(book) {
-  return book.coverUrl || bookCoverUrl(book.coverId);
 }

@@ -28,7 +28,7 @@ import {
   createCategoryImage,
   createPublisherLogo,
 } from '../utils/taxonomyArtwork.js';
-import { authorPhotoUrl, catalogBookCoverUrl } from '../utils/realCatalogImages.js';
+import { authorPhotoUrl, bookCoverUrl } from '../utils/realCatalogImages.js';
 import { LEGACY_DEMO_AUTHORS, REAL_DEMO_BOOKS } from './realDemoBooks.js';
 
 const ROLES = [
@@ -315,7 +315,7 @@ async function seedCatalog() {
 
   for (const [i, item] of REAL_DEMO_BOOKS.entries()) {
     const slug = slugify(item.title.en);
-    const coverImage = catalogBookCoverUrl(item);
+    const coverImage = bookCoverUrl(item.coverId);
     const existing = await Book.findOne({ slug: item.legacySlug }) || await Book.findOne({ slug });
     const categoryId = categoryMap[item.category];
     const authorId = authorMap[item.author];

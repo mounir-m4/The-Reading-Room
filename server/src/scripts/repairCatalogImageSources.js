@@ -3,7 +3,7 @@ import { connectDatabase, disconnectDatabase } from '../config/database.js';
 import { Author } from '../models/Author.js';
 import { Book } from '../models/Book.js';
 import { logger } from '../utils/logger.js';
-import { authorPhotoUrl, bookCoverUrl, catalogBookCoverUrl } from '../utils/realCatalogImages.js';
+import { authorPhotoUrl, bookCoverUrl } from '../utils/realCatalogImages.js';
 import { slugify } from '../utils/slugify.js';
 import { REAL_DEMO_BOOKS } from './realDemoBooks.js';
 
@@ -25,7 +25,7 @@ async function repairCatalogImageSources() {
       .map((item) => ({
         slug: slugify(item.title.en),
         title: item.title.en,
-        coverImage: catalogBookCoverUrl(item),
+        coverImage: bookCoverUrl(item.coverId),
       })),
   ];
   const books = [];
@@ -36,14 +36,17 @@ async function repairCatalogImageSources() {
     books.push({ ...item, id: book._id });
   }
 
-  const anneFrank = await Author.findOne({ slug: slugify('Anne Frank') }).select('_id name');
-  if (!anneFrank) throw new Error('Could not find Anne Frank in the author catalogue');
-  const anneFrankPhoto = authorPhotoUrl('Anne Frank');
+  const authorsToRepair = [];
+  for (const name of ['Anne Frank', 'Morgan Housel']) {
+    const author = await Author.findOne({ slug: slugify(name) }).select('_id name');
+    if (!author) throw new Error(`Could not find "${name}" in the author catalogue`);
+    authorsToRepair.push({ id: author._id, name: author.name, photo: authorPhotoUrl(name) });
+  }
 
   if (dryRun) {
     logger.info('Catalogue image source preflight passed:', {
       books: books.map(({ title }) => title),
-      authors: [anneFrank.name],
+      authors: authorsToRepair.map(({ name }) => name),
     });
     await disconnectDatabase();
     return;
@@ -70,19 +73,21 @@ async function repairCatalogImageSources() {
     }
   }
 
-  const authorResult = await Author.updateOne(
-    { _id: anneFrank._id, slug: slugify('Anne Frank') },
-    { $set: { photo: anneFrankPhoto } },
-  );
-  if (authorResult.matchedCount !== 1) {
-    throw new Error('Anne Frank photo update did not match the author record');
-  }
-  const storedAuthor = await Author.findById(anneFrank._id).select('photo').lean();
-  if (storedAuthor?.photo !== anneFrankPhoto) {
-    throw new Error('Anne Frank photo update verification failed');
+  for (const author of authorsToRepair) {
+    const authorResult = await Author.updateOne(
+      { _id: author.id, slug: slugify(author.name) },
+      { $set: { photo: author.photo } },
+    );
+    if (authorResult.matchedCount !== 1) {
+      throw new Error(`Photo update did not match "${author.name}"`);
+    }
+    const storedAuthor = await Author.findById(author.id).select('photo').lean();
+    if (storedAuthor?.photo !== author.photo) {
+      throw new Error(`Photo update verification failed for "${author.name}"`);
+    }
   }
 
-  logger.info('Catalogue image sources repaired:', { books: books.length, authors: 1 });
+  logger.info('Catalogue image sources repaired:', { books: books.length, authors: authorsToRepair.length });
   await disconnectDatabase();
 }
 
