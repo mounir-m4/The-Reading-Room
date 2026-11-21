@@ -177,19 +177,12 @@ Expected output contains `200` and `{"success":true,"data":{"status":"ok"}}`.
 
 ### Local DNS note
 
-If seeding fails with `querySrv EREFUSED _mongodb._tcp.<cluster>.mongodb.net`, your local router/ISP DNS is refusing external SRV queries. Netlify is unaffected. To seed from this machine, temporarily point Node at public resolvers by creating a preload file:
+If seeding or startup fails with `querySrv EREFUSED _mongodb._tcp.<cluster>.mongodb.net`, your local router/ISP DNS is refusing external SRV queries. The root npm scripts now load `scripts/dns-preload.mjs`, which points Node at public resolvers automatically. Netlify is unaffected.
 
-```js
-// atlas-dns-preload.mjs
-import dns from 'node:dns';
-dns.setServers(['8.8.8.8', '1.1.1.1']);
-```
-
-Then run the scripts with that preload:
+To opt out and use your system DNS, set:
 
 ```powershell
-node --import "file:///C:/path/to/atlas-dns-preload.mjs" server/src/scripts/seed.js
-node --import "file:///C:/path/to/atlas-dns-preload.mjs" server/src/scripts/seedDemo.js
+$env:NODE_DNS_RESOLVERS = "system"
 ```
 
 Alternatively, configure your router or Windows network adapter to use `8.8.8.8` / `1.1.1.1`.
