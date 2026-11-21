@@ -359,7 +359,7 @@ The standard deployment is **Netlify + MongoDB Atlas**. Netlify serves the built
 5. Open the Netlify URL and verify the storefront, checkout, admin login and Arabic RTL.
 6. For real payments/email/uploads, add Stripe, SMTP and Cloudinary credentials and configure the Stripe webhook at `https://<domain>/api/payments/webhook`.
 
-For personal, non-commercial testing, the repository also supports **Vercel Hobby** with the existing `/api` routes. Hobby terms do not allow commercial use. See [DEPLOYMENT.md](DEPLOYMENT.md) for Atlas/Netlify instructions, Vercel testing setup, environment variables and post-deploy checks. Do not commit `.env`, uploads or build output; they are excluded by `.gitignore`.
+For personal, non-commercial testing, the repository also supports **Vercel Hobby** with the existing `/api` routes. Hobby terms do not allow commercial use. See [DEPLOYMENT.md](DEPLOYMENT.md) for Atlas/Netlify instructions, Vercel testing setup, environment variables and post-deploy checks. Do not commit `.env`, uploads or generated build output.
 
 ---
 
