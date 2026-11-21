@@ -16,6 +16,7 @@
 ## Contents
 
 - [Overview](#overview)
+- [Live preview](#live-preview)
 - [Screenshots](#screenshots)
 - [Features](#features)
 - [Architecture](#architecture)
@@ -45,6 +46,12 @@
 - MAD minor-unit pricing with server-side totals and immutable order snapshots.
 
 External services are optional in development. Without them the app uses local uploads, console email, COD/mock payments and static exchange rates. Production should configure the real services.
+
+---
+
+## Live preview
+
+[Open The Reading Room](https://the-reading-room-pi-umber.vercel.app/)
 
 ---
 
