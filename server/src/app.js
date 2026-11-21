@@ -18,8 +18,7 @@ const appDirectory = import.meta.url
   ? path.dirname(fileURLToPath(import.meta.url))
   : path.resolve(process.cwd(), 'server/src');
 
-export function createApp() {
-  const app = express();
+export function createApp(app = express()) {
   app.set('trust proxy', 1);
   app.disable('x-powered-by');
 
