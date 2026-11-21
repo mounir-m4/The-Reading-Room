@@ -18,7 +18,8 @@ const appDirectory = import.meta.url
   ? path.dirname(fileURLToPath(import.meta.url))
   : path.resolve(process.cwd(), 'server/src');
 
-export function createApp(app = express()) {
+export function createApp() {
+  const app = express();
   app.set('trust proxy', 1);
   app.disable('x-powered-by');
 
@@ -80,7 +81,7 @@ export function createApp(app = express()) {
     }
   });
 
-  if (fs.existsSync(clientDist)) {
+  if (!process.env.VERCEL && fs.existsSync(clientDist)) {
     app.use(express.static(clientDist, { maxAge: '1y', index: false }));
     app.get('*', (_req, res) => res.sendFile(path.join(clientDist, 'index.html')));
   }

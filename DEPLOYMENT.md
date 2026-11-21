@@ -27,7 +27,7 @@ Free-tier caveats:
 
 ## Deploy on Vercel Hobby for testing
 
-The repository includes `vercel.json` and a root Express entrypoint. On Vercel, the Vite build writes static assets to the root `public/` directory, which Vercel serves through its CDN; SPA routes fall back to `index.html`. Express handles `/api/*`; `/api/health` does not require MongoDB, while other API requests connect to Atlas.
+The repository includes `vercel.json` and a shared Express function in `api/index.js`. Vercel builds the Vite client into `client/dist` and serves its static files; API and SEO requests are rewritten to the shared Express function, while SPA routes fall back to `index.html`. `/api/health` does not require MongoDB, while other API requests connect to Atlas.
 
 1. Import `mounir-m4/The-Reading-Room` into Vercel and keep the project root at the repository root.
 2. Use the Hobby plan for personal testing only.
@@ -35,7 +35,7 @@ The repository includes `vercel.json` and a root Express entrypoint. On Vercel, 
    - `MONGO_URI` (your Atlas connection string)
    - `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` (two distinct, long random values)
    - `CLIENT_URL` (the deployed Vercel URL, if automatic URL detection is not available)
-4. Deploy the project. Vercel reads the Express framework, build command, and SPA rewrites from `vercel.json`.
+4. Deploy the project. Vercel reads the framework, build command, output directory, and rewrites from `vercel.json`.
 5. Verify `/api/health`, then check the storefront and `/api/books`.
 
 Do not paste secrets into chat or commit them to GitHub. Enter them directly in Vercel’s Environment Variables settings. Seed the Atlas database using the local shell instructions above if the selected database is empty. Optional payment, email and image-upload integrations require their corresponding credentials; keep real payments disabled for a test deployment.

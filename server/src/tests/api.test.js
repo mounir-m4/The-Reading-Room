@@ -53,14 +53,14 @@ afterEach(() => {
   else process.env.VERCEL = originalVercel;
 });
 
-const getVercelApp = async () => (await import('../../../index.js')).default;
+const getVercelHandler = async () => (await import('../../../api/index.js')).default;
 
 describe('Vercel API hosting', () => {
   it('serves the health endpoint without connecting to MongoDB', async () => {
     process.env.VERCEL = '1';
-    const vercelApp = await getVercelApp();
+    const vercelHandler = await getVercelHandler();
     const connectSpy = vi.spyOn(database, 'connectDatabase');
-    const response = await request(vercelApp).get('/api/health');
+    const response = await request(vercelHandler).get('/api/index?__vercel_api_path=health');
 
     expect(response.status).toBe(200);
     expect(response.body.data.status).toBe('ok');
@@ -69,9 +69,9 @@ describe('Vercel API hosting', () => {
 
   it('connects to MongoDB before serving the catalogue', async () => {
     process.env.VERCEL = '1';
-    const vercelApp = await getVercelApp();
+    const vercelHandler = await getVercelHandler();
     const connectSpy = vi.spyOn(database, 'connectDatabase');
-    const response = await request(vercelApp).get('/api/books?currency=USD');
+    const response = await request(vercelHandler).get('/api/index?__vercel_api_path=books&currency=USD');
 
     expect(response.status).toBe(200);
     expect(response.body.data.length).toBeGreaterThan(0);
