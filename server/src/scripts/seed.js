@@ -15,6 +15,21 @@ import { Coupon } from '../models/Coupon.js';
 import { CMSPage, HomepageSection, Banner, Testimonial } from '../models/Content.js';
 import { slugify } from '../utils/slugify.js';
 
+const BOOK_COVERS = {
+  'the-alchemist': 'https://covers.openlibrary.org/b/id/14846382-L.jpg?default=false',
+  'atomic-habits': 'https://covers.openlibrary.org/b/id/12539702-L.jpg?default=false',
+  dune: 'https://covers.openlibrary.org/b/id/11481354-L.jpg?default=false',
+  'the-little-prince': 'https://covers.openlibrary.org/b/id/13578797-L.jpg?default=false',
+  sapiens: 'https://covers.openlibrary.org/b/id/8634250-L.jpg?default=false',
+  'rich-dad-poor-dad': 'https://covers.openlibrary.org/b/id/8315603-L.jpg?default=false',
+  'the-midnight-library': 'https://covers.openlibrary.org/b/id/10313767-L.jpg?default=false',
+  neuromancer: 'https://covers.openlibrary.org/b/id/283860-L.jpg?default=false',
+  'the-psychology-of-money': 'https://covers.openlibrary.org/b/id/10389354-L.jpg?default=false',
+  'the-book-of-lost-tales': 'https://covers.openlibrary.org/b/id/2154260-L.jpg?default=false',
+  'thinking-fast-and-slow': 'https://covers.openlibrary.org/b/id/13290711-L.jpg?default=false',
+  'a-short-history-of-nearly-everything': 'https://covers.openlibrary.org/b/id/12725620-L.jpg?default=false',
+};
+
 const ALL = PERMISSIONS;
 const ROLES = [
   { name: 'Super Admin', slug: 'super-admin', permissions: ALL },
@@ -47,15 +62,6 @@ const BOOKS = [
   { title: { en: 'The Book of Lost Tales', fr: 'Le Livre des contes perdus', ar: 'كتاب الحكايات المفقودة' }, author: 'J.R.R. Tolkien', category: 'Fiction', price: 23000, compare: 0, stock: 3, tags: ['fantasy'], year: 1983 },
   { title: { en: 'Thinking, Fast and Slow', fr: 'Système 1, Système 2', ar: 'التفكير السريع والبطيء' }, author: 'Daniel Kahneman', category: 'Self Help', price: 19500, compare: 23000, stock: 9, tags: ['psychology'], year: 2011 },
   { title: { en: 'A Short History of Nearly Everything', fr: 'Une brève histoire de presque tout', ar: 'تاريخ مختصر تقريباً لكل شيء' }, author: 'Bill Bryson', category: 'History', price: 17500, compare: 0, stock: 14, tags: ['science'], year: 2003 },
-];
-
-const COVERS = [
-  'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&q=80',
-  'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&q=80',
-  'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=600&q=80',
-  'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=600&q=80',
-  'https://images.unsplash.com/photo-1589998059171-988d887df646?w=600&q=80',
-  'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=600&q=80',
 ];
 
 async function seed() {
@@ -114,6 +120,7 @@ async function seed() {
   );
 
   for (const [i, item] of BOOKS.entries()) {
+    const coverImage = BOOK_COVERS[slugify(item.title.en)];
     await Book.findOneAndUpdate(
       { slug: slugify(item.title.en) },
       {
@@ -132,8 +139,8 @@ async function seed() {
         publicationDate: new Date(`${item.year}-05-01`),
         pages: 200 + i * 17,
         language: item.title.ar ? 'en' : 'en',
-        coverImage: COVERS[i % COVERS.length],
-        images: [COVERS[(i + 1) % COVERS.length]],
+        coverImage,
+        images: [coverImage],
         price: item.price,
         compareAtPrice: item.compare,
         stock: item.stock,

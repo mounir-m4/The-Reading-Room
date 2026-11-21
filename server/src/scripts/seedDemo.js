@@ -24,6 +24,7 @@ import {
   ExchangeRate,
 } from '../models/Operations.js';
 import { Banner, CMSPage, HomepageSection, NewsletterSubscriber, Testimonial } from '../models/Content.js';
+import { createDemoBookCover } from '../utils/demoBookCover.js';
 
 const ROLES = [
   { name: 'Super Admin', slug: 'super-admin', permissions: PERMISSIONS },
@@ -81,15 +82,6 @@ const EXTRA_BOOKS = [
   { title: { en: 'The Wooden Boat', fr: 'Le Bateau en bois', ar: 'القارب الخشبي' }, author: 'Amine Belkacem', category: 'Children', publisher: 'Éditions Lumière', price: 7900, compare: 9900, stock: 48, year: 2014, tags: ['children', 'classic'] },
   { title: { en: 'A Brief History of Coffee', fr: 'Une brève histoire du café', ar: 'تاريخ مختصر للقهوة' }, author: 'Tomás Vega', category: 'History', publisher: 'Atlas House', price: 15400, compare: 0, stock: 6, year: 2018, tags: ['history', 'food'] },
   { title: { en: 'The Glass Kingdom', fr: 'Le Royaume de verre', ar: 'المملكة الزجاجية' }, author: 'Elena Rossi', category: 'Fantasy', publisher: 'Northwind Press', price: 21000, compare: 24500, stock: 13, year: 2024, tags: ['fantasy', 'new'] },
-];
-
-const COVERS = [
-  'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&q=80',
-  'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&q=80',
-  'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=600&q=80',
-  'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=600&q=80',
-  'https://images.unsplash.com/photo-1589998059171-988d887df646?w=600&q=80',
-  'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=600&q=80',
 ];
 
 const PHOTOS = [
@@ -341,6 +333,7 @@ async function seedCatalog() {
 
   for (const [i, item] of EXTRA_BOOKS.entries()) {
     const slug = slugify(item.title.en);
+    const coverImage = createDemoBookCover(item.title.en, item.author);
     const discountPercent = item.compare > item.price
       ? Math.round((1 - item.price / item.compare) * 100)
       : 0;
@@ -367,8 +360,8 @@ async function seedCatalog() {
           fr: `${item.title.fr} de ${item.author} est une lecture mémorable publiée par ${item.publisher}, disponible dans notre sélection.`,
           ar: `${item.title.ar} للكاتب ${item.author} قراءة مميزة صدرت عن ${item.publisher}، وهي متاحة الآن في مجموعتنا المختارة.`,
         },
-        coverImage: COVERS[i % COVERS.length],
-        images: [COVERS[(i + 2) % COVERS.length]],
+        coverImage,
+        images: [coverImage],
         price: item.price,
         compareAtPrice: item.compare,
         discountPercent,
