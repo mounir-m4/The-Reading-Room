@@ -33,6 +33,7 @@ export const env = {
     || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined)
     || 'http://localhost:5173',
   mongoUri: process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/the_reading_room',
+  mongoDbName: process.env.MONGODB_DB || 'the_reading_room',
   useMemoryDb: process.env.USE_MEMORY_DB === 'true',
   jwt: {
     accessSecret: process.env.JWT_ACCESS_SECRET || 'dev-access-secret-change-me',

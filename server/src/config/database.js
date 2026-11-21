@@ -20,11 +20,12 @@ export function connectDatabase() {
     }
 
     await mongoose.connect(env.mongoUri, {
+      dbName: env.mongoDbName,
       maxPoolSize: 20,
       minPoolSize: 2,
       serverSelectionTimeoutMS: 10_000,
     });
-    logger.info('Connected to MongoDB');
+    logger.info(`Connected to MongoDB database "${mongoose.connection.name}"`);
   })();
 
   // A failed attempt must not be cached forever (important for warm serverless instances).

@@ -84,6 +84,7 @@ In **Site configuration → Environment variables**, add:
 | --- | --- | --- |
 | `NODE_ENV` | Yes | `production` |
 | `MONGO_URI` | Yes | Atlas SRV connection string |
+| `MONGODB_DB` | No | Database containing the app data; defaults to `the_reading_room` |
 | `JWT_ACCESS_SECRET` | Yes | Long random value, different from the refresh secret |
 | `JWT_REFRESH_SECRET` | Yes | Long random value, different from the access secret |
 | `CLIENT_URL` | No | Defaults to the platform URL (`URL` on Netlify or `VERCEL_URL` on Vercel); set your custom domain if needed |

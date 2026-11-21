@@ -208,6 +208,7 @@ For MongoDB Atlas, use the SRV connection string, create a database user, and al
 
 ```dotenv
 MONGO_URI=mongodb+srv://USER:PASSWORD@cluster.mongodb.net/the_reading_room?retryWrites=true&w=majority
+MONGODB_DB=the_reading_room
 ```
 
 ### 3. Seed the database
@@ -241,6 +242,7 @@ Open:
 | `PORT` | No | API/production server port. Defaults to `5000`. |
 | `CLIENT_URL` | No | Allowed CORS origin. Defaults to `http://localhost:5173`. |
 | `MONGO_URI` | Yes | Local MongoDB URI or Atlas SRV URI. |
+| `MONGODB_DB` | No | MongoDB database containing app data. Defaults to `the_reading_room`. |
 | `USE_MEMORY_DB` | No | `true` uses `mongodb-memory-server`; used by tests. |
 | `JWT_ACCESS_SECRET` | Yes | Long random secret for 15-minute access tokens. |
 | `JWT_REFRESH_SECRET` | Yes | Separate long random secret for refresh cookies. |
