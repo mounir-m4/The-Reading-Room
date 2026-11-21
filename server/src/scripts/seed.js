@@ -18,13 +18,13 @@ import {
   createCategoryImage,
   createPublisherLogo,
 } from '../utils/taxonomyArtwork.js';
-import { authorPhotoUrl } from '../utils/realCatalogImages.js';
+import { authorPhotoUrl, bookCoverUrl } from '../utils/realCatalogImages.js';
 
 const BOOK_COVERS = {
   'the-alchemist': 'https://covers.openlibrary.org/b/id/14846382-L.jpg?default=false',
   'atomic-habits': 'https://covers.openlibrary.org/b/id/12539702-L.jpg?default=false',
   dune: 'https://covers.openlibrary.org/b/id/11481354-L.jpg?default=false',
-  'the-little-prince': 'https://covers.openlibrary.org/b/id/13578797-L.jpg?default=false',
+  'the-little-prince': bookCoverUrl(15217314),
   sapiens: 'https://covers.openlibrary.org/b/id/8634250-L.jpg?default=false',
   'rich-dad-poor-dad': 'https://covers.openlibrary.org/b/id/8315603-L.jpg?default=false',
   'the-midnight-library': 'https://covers.openlibrary.org/b/id/10313767-L.jpg?default=false',

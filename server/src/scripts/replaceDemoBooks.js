@@ -5,7 +5,7 @@ import { Book } from '../models/Book.js';
 import { Category } from '../models/Category.js';
 import { logger } from '../utils/logger.js';
 import { slugify } from '../utils/slugify.js';
-import { authorPhotoUrl, bookCoverUrl } from '../utils/realCatalogImages.js';
+import { authorPhotoUrl, catalogBookCoverUrl } from '../utils/realCatalogImages.js';
 import { LEGACY_DEMO_AUTHORS, REAL_DEMO_BOOKS } from './realDemoBooks.js';
 
 const dryRun = process.argv.includes('--dry-run');
@@ -23,7 +23,7 @@ async function replaceDemoBooks() {
     const legacyBook = await Book.findOne({ slug: item.legacySlug });
     const currentBook = await Book.findOne({ slug });
     const categoryId = categoryIds.get(item.category);
-    const coverImage = bookCoverUrl(item.coverId);
+    const coverImage = catalogBookCoverUrl(item);
     const photo = authorPhotoUrl(item.author);
     if (legacyBook && currentBook && !legacyBook._id.equals(currentBook._id)) {
       throw new Error(`Both legacy and replacement books exist for "${item.title.en}"`);

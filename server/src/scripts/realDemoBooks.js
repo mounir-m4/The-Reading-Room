@@ -41,13 +41,13 @@ export const REAL_DEMO_BOOKS = [
   {
     legacySlug: 'a-table-for-twelve',
     title: { en: 'Salt, Fat, Acid, Heat', fr: 'Sel, gras, acide, chaleur', ar: 'ملح ودهون وحمض وحرارة' },
-    author: 'Samin Nosrat', category: 'Cooking', coverId: 8315567, year: 2017,
+    author: 'Samin Nosrat', category: 'Cooking', coverUrl: 'https://books.google.com/books/content?id=yvqxDgAAQBAJ&printsec=frontcover&img=1&zoom=1', year: 2017,
     price: 22000, compare: 25500, stock: 33, tags: ['cooking', 'gift'],
   },
   {
     legacySlug: 'the-blue-hour',
     title: { en: 'Pride and Prejudice', fr: 'Orgueil et Préjugés', ar: 'كبرياء وتحامل' },
-    author: 'Jane Austen', category: 'Romance', coverId: 14348537, year: 1813,
+    author: 'Jane Austen', category: 'Romance', coverId: 15185692, year: 1813,
     price: 11900, compare: 14900, stock: 22, tags: ['romance', 'bestseller'],
   },
   {
@@ -65,7 +65,7 @@ export const REAL_DEMO_BOOKS = [
   {
     legacySlug: 'poems-for-the-long-way-home',
     title: { en: 'Milk and Honey', fr: 'Lait et miel', ar: 'حليب وعسل' },
-    author: 'Rupi Kaur', category: 'Poetry', coverId: 8743595, year: 2014,
+    author: 'Rupi Kaur', category: 'Poetry', coverId: 14800697, year: 2014,
     price: 9500, compare: 12000, stock: 41, tags: ['poetry'],
   },
   {
@@ -89,7 +89,7 @@ export const REAL_DEMO_BOOKS = [
   {
     legacySlug: 'bread-and-orange-blossom',
     title: { en: 'Mastering the Art of French Cooking', fr: 'Maîtriser l’art de la cuisine française', ar: 'إتقان فن المطبخ الفرنسي' },
-    author: 'Julia Child', category: 'Cooking', coverId: 254207, year: 1967,
+    author: 'Julia Child', category: 'Cooking', coverId: 7258125, year: 1967,
     price: 12800, compare: 15500, stock: 26, tags: ['cooking', 'classic'],
   },
   {
