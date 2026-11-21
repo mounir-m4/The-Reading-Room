@@ -2,11 +2,11 @@ import dotenv from 'dotenv';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(__dirname, '../../..');
+const configDirectory = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(configDirectory, '../../..');
 
 dotenv.config({ path: path.join(root, '.env') });
-dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config({ path: path.join(configDirectory, '../.env') });
 
 const number = (value, fallback) => {
   const parsed = Number.parseInt(value ?? '', 10);

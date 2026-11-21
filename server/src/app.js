@@ -13,7 +13,7 @@ import { apiLimiter, sanitizeInput } from './middleware/security.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 import { logger } from './utils/logger.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const appDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 export function createApp() {
   const app = express();
@@ -51,7 +51,7 @@ export function createApp() {
   }
 
   // SEO files & built SPA
-  const clientDist = path.resolve(__dirname, '../../client/dist');
+  const clientDist = path.resolve(appDirectory, '../../client/dist');
   app.get('/robots.txt', (_req, res) => res.type('text/plain').send(`User-agent: *\nAllow: /\nSitemap: ${env.clientUrl}/sitemap.xml\n`));
   app.get('/sitemap.xml', async (_req, res) => {
     try {
