@@ -2,7 +2,9 @@ import dotenv from 'dotenv';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const configDirectory = path.dirname(fileURLToPath(import.meta.url));
+const configDirectory = import.meta.url
+  ? path.dirname(fileURLToPath(import.meta.url))
+  : path.resolve(process.cwd(), 'server/src/config');
 const root = path.resolve(configDirectory, '../../..');
 
 dotenv.config({ path: path.join(root, '.env') });

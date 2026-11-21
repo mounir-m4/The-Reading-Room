@@ -13,7 +13,9 @@ import { apiLimiter, sanitizeInput } from './middleware/security.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 import { logger } from './utils/logger.js';
 
-const appDirectory = path.dirname(fileURLToPath(import.meta.url));
+const appDirectory = import.meta.url
+  ? path.dirname(fileURLToPath(import.meta.url))
+  : path.resolve(process.cwd(), 'server/src');
 
 export function createApp() {
   const app = express();
