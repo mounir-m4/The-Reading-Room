@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "seed": "node src/scripts/seed.js",
     "seed:demo": "node src/scripts/seedDemo.js",
+    "seed:taxonomy-images": "node src/scripts/seedTaxonomyImages.js",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "lint": "eslint src"

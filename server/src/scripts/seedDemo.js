@@ -25,6 +25,11 @@ import {
 } from '../models/Operations.js';
 import { Banner, CMSPage, HomepageSection, NewsletterSubscriber, Testimonial } from '../models/Content.js';
 import { createDemoBookCover } from '../utils/demoBookCover.js';
+import {
+  createAuthorAvatar,
+  createCategoryImage,
+  createPublisherLogo,
+} from '../utils/taxonomyArtwork.js';
 
 const ROLES = [
   { name: 'Super Admin', slug: 'super-admin', permissions: PERMISSIONS },
@@ -278,6 +283,7 @@ async function seedCatalog() {
       { slug: slugify(name.en) },
       {
         name,
+        image: createCategoryImage(name.en),
         description: {
           en: `Hand-picked ${name.en.toLowerCase()} titles for every reader.`,
           fr: `Une sélection de livres ${name.fr.toLowerCase()} pour tous les lecteurs.`,
@@ -295,7 +301,7 @@ async function seedCatalog() {
       { slug: slugify(name) },
       {
         name,
-        photo: PHOTOS[i % PHOTOS.length],
+        photo: createAuthorAvatar(name),
         biography: {
           en: `${name} writes stories that explore memory, place and the people we become.`,
           fr: `${name} écrit des histoires qui explorent la mémoire, les lieux et notre devenir.`,
@@ -314,6 +320,7 @@ async function seedCatalog() {
       { slug: slugify(publisher.name) },
       {
         name: publisher.name,
+        logo: createPublisherLogo(publisher.name),
         contactEmail: publisher.email,
         website: `https://${slugify(publisher.name)}.test`,
         phone: '+212 600 000 000',

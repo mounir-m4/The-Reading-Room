@@ -14,6 +14,11 @@ import { StoreSetting } from '../models/Operations.js';
 import { Coupon } from '../models/Coupon.js';
 import { CMSPage, HomepageSection, Banner, Testimonial } from '../models/Content.js';
 import { slugify } from '../utils/slugify.js';
+import {
+  createAuthorAvatar,
+  createCategoryImage,
+  createPublisherLogo,
+} from '../utils/taxonomyArtwork.js';
 
 const BOOK_COVERS = {
   'the-alchemist': 'https://covers.openlibrary.org/b/id/14846382-L.jpg?default=false',
@@ -97,7 +102,13 @@ async function seed() {
   for (const [i, name] of CATEGORIES.entries()) {
     const doc = await Category.findOneAndUpdate(
       { slug: slugify(name.en) },
-      { name, description: { en: `Explore our ${name.en} collection.`, fr: `Découvrez notre collection ${name.fr}.`, ar: `استكشف مجموعة ${name.ar}.` }, position: i, isActive: true },
+      {
+        name,
+        description: { en: `Explore our ${name.en} collection.`, fr: `Découvrez notre collection ${name.fr}.`, ar: `استكشف مجموعة ${name.ar}.` },
+        image: createCategoryImage(name.en),
+        position: i,
+        isActive: true,
+      },
       { upsert: true, new: true },
     );
     categoryMap[name.en] = doc._id;
@@ -107,7 +118,11 @@ async function seed() {
   for (const name of [...new Set(BOOKS.map((b) => b.author))]) {
     const doc = await Author.findOneAndUpdate(
       { slug: slugify(name) },
-      { name, biography: { en: `${name} is a celebrated author whose work has inspired readers worldwide.`, fr: `${name} est un auteur célébré dont l'œuvre a inspiré des lecteurs du monde entier.`, ar: `${name} كاتب مشهور ألهمت أعماله قرّاء في جميع أنحاء العالم.` } },
+      {
+        name,
+        photo: createAuthorAvatar(name),
+        biography: { en: `${name} is a celebrated author whose work has inspired readers worldwide.`, fr: `${name} est un auteur célébré dont l'œuvre a inspiré des lecteurs du monde entier.`, ar: `${name} كاتب مشهور ألهمت أعماله قرّاء في جميع أنحاء العالم.` },
+      },
       { upsert: true, new: true },
     );
     authorMap[name] = doc._id;
@@ -115,7 +130,11 @@ async function seed() {
 
   const publisher = await Publisher.findOneAndUpdate(
     { slug: 'reading-room-press' },
-    { name: 'Reading Room Press', contactEmail: 'press@thereadingroom.test' },
+    {
+      name: 'Reading Room Press',
+      logo: createPublisherLogo('Reading Room Press'),
+      contactEmail: 'press@thereadingroom.test',
+    },
     { upsert: true, new: true },
   );
 
